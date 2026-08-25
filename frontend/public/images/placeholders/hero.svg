@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="664" viewBox="0 0 1440 664" fill="none" role="img" aria-label="Hero placeholder">
+  <defs>
+    <linearGradient id="hero" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#DFCDE4"/>
+      <stop offset="1" stop-color="#F4F0F2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="664" fill="url(#hero)"/>
+  <ellipse cx="1100" cy="380" rx="220" ry="180" fill="#EADDD2" opacity="0.8"/>
+  <ellipse cx="900" cy="300" rx="160" ry="140" fill="#FEEBDB" opacity="0.7"/>
+</svg>

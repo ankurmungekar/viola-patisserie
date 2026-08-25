@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+frontend/.env.local
+
+# Next.js
+frontend/.next/
+frontend/out/
+
+# Testing
+coverage/
+
+# OS / editor
+.DS_Store
+*.log
+
+# WordPress (Docker volumes are external; ignore uploads if mounted locally)
+wordpress/uploads/
+
+# Docker
+db_data/
+wp_data/

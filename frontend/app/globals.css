@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #240630;
+  --viola-primary: #6a1f87;
+  --viola-accent: #8d0ca2;
+  --viola-text: #240630;
+  --viola-topbar: #f2e7e1;
+  --viola-border: #f0e4dd;
+  --viola-category-bg: #eaddd2;
+  --viola-hero-from: #dfcde4;
+  --viola-hero-to: #f4f0f2;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-viola-primary: var(--viola-primary);
+  --color-viola-accent: var(--viola-accent);
+  --color-viola-text: var(--viola-text);
+  --color-viola-topbar: var(--viola-topbar);
+  --color-viola-border: var(--viola-border);
+  --color-viola-category-bg: var(--viola-category-bg);
+  --font-sans: var(--font-source-sans);
+  --font-display: var(--font-cormorant);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-source-sans), system-ui, sans-serif;
+}
+
+@layer utilities {
+  .tracking-viola {
+    letter-spacing: 0.06em;
+  }
+
+  .tracking-viola-wide {
+    letter-spacing: 0.04em;
+  }
+
+  .hero-gradient {
+    background: linear-gradient(180deg, var(--viola-hero-from) 0%, var(--viola-hero-to) 100%);
+  }
+
+  .custom-cakes-gradient {
+    background: linear-gradient(
+      135deg,
+      #dfcde4 0%,
+      #feebdb 50%,
+      #f9eaf2 100%
+    );
+  }
+
+  .category-card-gradient {
+    background: linear-gradient(180deg, #eaded3 0%, #e7d7c8 100%);
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--viola-accent);
+  outline-offset: 2px;
+}
