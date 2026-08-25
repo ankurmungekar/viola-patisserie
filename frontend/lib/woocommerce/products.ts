@@ -1,4 +1,5 @@
 import { safeStoreFetch } from "@/lib/woocommerce/client";
+import { DEFAULT_PRODUCT_IMAGE } from "@/lib/config/products";
 import { mockProducts } from "@/lib/woocommerce/mocks";
 import { formatPrice } from "@/lib/utils/format-price";
 import type { Product } from "@/types/product";
@@ -57,14 +58,14 @@ function mapProduct(product: StoreProduct): Product {
     price,
     priceHtml: formatPrice(price),
     image: {
-      src: image?.thumbnail ?? image?.src ?? "/images/placeholders/product.svg",
+      src: image?.thumbnail ?? image?.src ?? DEFAULT_PRODUCT_IMAGE,
       alt: image?.alt ?? product.name,
     },
     permalink: `/cakes/${product.slug}`,
   };
 }
 
-export async function getBestsellerProducts(limit = 3): Promise<Product[]> {
+export async function getBestsellerProducts(limit = 4): Promise<Product[]> {
   const featured = await safeStoreFetch<StoreProduct[]>({
     path: "/products",
     searchParams: {

@@ -1,3 +1,4 @@
+import { DEFAULT_CATEGORY_IMAGE } from "@/lib/config/categories";
 import { signatureCategorySlugs } from "@/lib/config/site";
 import { safeStoreFetch } from "@/lib/woocommerce/client";
 import { mockCategories } from "@/lib/woocommerce/mocks";
@@ -22,7 +23,7 @@ function mapCategory(category: StoreCategory): Category {
   const imageSrc =
     category.image?.thumbnail ??
     category.image?.src ??
-    "/images/placeholders/category.svg";
+    DEFAULT_CATEGORY_IMAGE;
 
   return {
     id: category.id,

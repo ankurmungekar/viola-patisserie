@@ -1,0 +1,14 @@
+---
+description: Do not write tests for this project
+alwaysApply: true
+---
+
+# No Tests
+
+Do not write, add, or update tests for this project.
+
+- Do not create `*.test.ts`, `*.test.tsx`, `*.spec.ts`, or `*.spec.tsx` files
+- Do not add test cases to existing test files
+- Do not suggest adding tests unless the user explicitly asks
+
+Existing tests may remain; do not expand test coverage unless explicitly requested.

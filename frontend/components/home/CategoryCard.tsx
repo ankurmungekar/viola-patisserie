@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getCategoryBackground } from "@/lib/config/categories";
 import type { Category } from "@/types/category";
 
 interface CategoryCardProps {
@@ -8,23 +9,26 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category, className = "" }: CategoryCardProps) {
+  const backgroundColor = getCategoryBackground(category.slug);
+
   return (
     <Link
       href={`/collections/${category.slug}`}
-      className={`group relative block overflow-hidden category-card-gradient ${className}`}
+      className={`group relative block h-[449px] w-[295px] shrink-0 overflow-hidden ${className}`}
+      style={{ backgroundColor }}
     >
-      <div className="relative aspect-[190/289] w-full">
-        <Image
-          src={category.image.src}
-          alt={category.image.alt}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-          sizes="(max-width: 768px) 50vw, 295px"
-        />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/35 to-transparent px-4 py-6">
-          <p className="font-display text-2xl text-white">{category.name}</p>
-        </div>
-      </div>
+      <Image
+        src={category.image.src}
+        alt=""
+        fill
+        aria-hidden
+        className="object-cover object-center transition-transform duration-300 group-hover:scale-[1.02]"
+        sizes="295px"
+      />
+
+      <h3 className="relative z-10 px-4 pt-8 text-center font-display text-4xl font-semibold leading-tight text-viola-text">
+        {category.name}
+      </h3>
     </Link>
   );
 }

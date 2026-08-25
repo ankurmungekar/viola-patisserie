@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Source_Sans_3 } from "next/font/google";
+import { Cormorant_Garamond, Italianno, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
@@ -16,6 +16,12 @@ const sourceSans = Source_Sans_3({
   variable: "--font-source-sans",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+});
+
+const italianno = Italianno({
+  variable: "--font-italianno",
+  subsets: ["latin"],
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -47,11 +53,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${sourceSans.variable} h-full antialiased`}
+      className={`${cormorant.variable} ${sourceSans.variable} ${italianno.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-white text-viola-text">
         <Header categories={categories} cartCount={0} />
-        <main className="flex-1 pt-[136px]">{children}</main>
+        <main className="flex-1 overflow-x-hidden pt-[136px]">{children}</main>
         <Footer categories={categories} />
       </body>
     </html>

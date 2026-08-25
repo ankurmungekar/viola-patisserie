@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { BestsellersSection } from "@/components/home/BestsellersSection";
 import { CustomCakesSection } from "@/components/home/CustomCakesSection";
 import { HeroBanner } from "@/components/home/HeroBanner";
+import { InstagramSection } from "@/components/home/InstagramSection";
 import { OurStorySection } from "@/components/home/OurStorySection";
 import { SignatureCollectionSection } from "@/components/home/SignatureCollectionSection";
 import { ValuePropsSection } from "@/components/home/ValuePropsSection";
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
 export default async function HomePage() {
   const [categories, products] = await Promise.all([
     getSignatureCategories(),
-    getBestsellerProducts(3),
+    getBestsellerProducts(4),
   ]);
 
   return (
@@ -33,9 +34,10 @@ export default async function HomePage() {
       <HeroBanner />
       <SignatureCollectionSection categories={categories} />
       <BestsellersSection products={products} />
+      <OurStorySection />
       <ValuePropsSection />
       <CustomCakesSection />
-      <OurStorySection />
+      <InstagramSection />
     </>
   );
 }

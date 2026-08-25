@@ -1,55 +1,35 @@
-import { Container } from "@/components/layout/Container";
-import {
-  BadgeIcon,
-  GiftBoxIcon,
-  MixerIcon,
-  TruckIcon,
-} from "@/components/icons";
-
-const valueProps = [
-  {
-    title: "Premium Ingredients",
-    description:
-      "We use the finest ingredients sourced from trusted artisans worldwide",
-    icon: MixerIcon,
-  },
-  {
-    title: "Artisan Craftsmanship",
-    description:
-      "Each creation is handcrafted with precision, passion and artistic touch",
-    icon: BadgeIcon,
-  },
-  {
-    title: "Fresh & Reliable Delivery",
-    description:
-      "Timely delivery with the utmost care to ensure freshness and perfection",
-    icon: TruckIcon,
-  },
-  {
-    title: "Beautiful Packaging",
-    description: "Elegantly packaged to make every moment extra special",
-    icon: GiftBoxIcon,
-  },
-] as const;
+import { valueProps } from "@/lib/config/value-props";
 
 export function ValuePropsSection() {
   return (
-    <section className="border-y border-viola-border bg-white py-16 md:py-20">
-      <Container>
-        <div className="grid gap-10 sm:grid-cols-2 xl:grid-cols-4">
-          {valueProps.map(({ title, description, icon: Icon }) => (
-            <div key={title} className="text-center">
+    <section className="bg-white py-16 md:py-20" aria-label="Why Viola Patisserie">
+      <div className="mx-auto w-full max-w-[1440px] px-4 md:px-8 xl:px-[100px]">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 xl:grid-cols-4 xl:gap-0">
+          {valueProps.map(({ title, description, icon: Icon }, index) => (
+            <div
+              key={title}
+              className="relative px-4 text-center xl:px-6"
+            >
+              {index > 0 ? (
+                <div
+                  aria-hidden="true"
+                  className="absolute left-0 top-1/2 hidden h-[142px] w-px -translate-y-1/2 bg-gradient-to-b from-white via-viola-primary to-white opacity-30 xl:block"
+                />
+              ) : null}
+
               <div className="mx-auto mb-4 flex h-[46px] w-[46px] items-center justify-center">
                 <Icon />
               </div>
-              <h3 className="font-display text-xl text-viola-accent">{title}</h3>
-              <p className="mt-3 text-sm leading-5 tracking-viola-wide text-viola-text">
+              <h3 className="font-display text-xl font-semibold text-viola-accent">
+                {title}
+              </h3>
+              <p className="mx-auto mt-3 max-w-[250px] text-sm leading-5 tracking-viola-wide text-viola-text">
                 {description}
               </p>
             </div>
           ))}
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

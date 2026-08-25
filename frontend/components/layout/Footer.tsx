@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Container } from "@/components/layout/Container";
+import { MapPinIcon, WhatsAppIcon } from "@/components/icons";
 import {
   footerExploreLinks,
   footerHelpLinks,
@@ -12,58 +12,73 @@ interface FooterProps {
   categories: Category[];
 }
 
+const footerCategoryLabels: Record<string, string> = {
+  cakes: "Cake",
+  macarons: "Macarons",
+  "tea-cakes": "Tea cakes",
+  "bento-cakes": "Bento Cakes",
+  cupcakes: "Cupcakes",
+  brownies: "Brownies",
+};
+
 export function Footer({ categories }: FooterProps) {
   return (
-    <footer className="mt-16 border-t border-viola-border bg-white">
-      <Container className="py-12">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-          <div>
+    <footer className="border-t border-viola-border bg-white">
+      <div className="mx-auto w-full max-w-[1440px] px-4 py-12 md:px-8 xl:px-[100px]">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
+          <div className="w-full max-w-[346px] shrink-0">
             <Image
               src="/images/logo.svg"
               alt={siteConfig.name}
               width={130}
               height={93}
-              className="mb-4 h-[72px] w-auto"
+              className="h-[93px] w-[130px]"
             />
-            <p className="max-w-xs text-base leading-5 tracking-viola-wide text-viola-text">
+            <p className="mt-3 max-w-[346px] text-base leading-5 tracking-viola-wide text-viola-text">
               {siteConfig.tagline}
             </p>
-            <p className="mt-6 text-base tracking-viola-wide text-viola-text">
-              {siteConfig.address}
-            </p>
-            <p className="mt-2 text-base tracking-viola-wide text-viola-text">
-              {siteConfig.phoneDisplay}
-            </p>
+            <div className="mt-6 flex items-start gap-2 text-base leading-5 tracking-viola-wide text-viola-text">
+              <span className="mt-0.5 shrink-0 text-viola-text">
+                <MapPinIcon />
+              </span>
+              <span>{siteConfig.address}</span>
+            </div>
+            <div className="mt-2 flex items-start gap-2 text-base leading-5 tracking-viola-wide text-viola-text">
+              <span className="mt-1 shrink-0 text-viola-text">
+                <WhatsAppIcon />
+              </span>
+              <span>{siteConfig.phoneDisplay}</span>
+            </div>
           </div>
 
-          <div>
-            <p className="mb-4 text-sm uppercase tracking-viola text-viola-accent">
+          <div className="w-full max-w-[233px] shrink-0">
+            <p className="text-sm uppercase tracking-viola text-viola-accent">
               Signature collection
             </p>
-            <ul className="space-y-2">
+            <ul className="mt-4 space-y-0">
               {categories.map((category) => (
                 <li key={category.id}>
                   <Link
                     href={`/collections/${category.slug}`}
-                    className="text-base leading-[30px] tracking-viola-wide text-viola-text hover:text-viola-primary"
+                    className="block py-0.5 text-base leading-[30px] tracking-viola-wide text-viola-text hover:text-viola-primary"
                   >
-                    {category.name}
+                    {footerCategoryLabels[category.slug] ?? category.name}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div>
-            <p className="mb-4 text-sm uppercase tracking-viola text-viola-accent">
+          <div className="w-full max-w-[232px] shrink-0">
+            <p className="text-sm uppercase tracking-viola text-viola-accent">
               Explore
             </p>
-            <ul className="space-y-2">
+            <ul className="mt-4 space-y-0">
               {footerExploreLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-base leading-[30px] tracking-viola-wide text-viola-text hover:text-viola-primary"
+                    className="block py-0.5 text-base leading-[30px] tracking-viola-wide text-viola-text hover:text-viola-primary"
                   >
                     {link.label}
                   </Link>
@@ -72,16 +87,16 @@ export function Footer({ categories }: FooterProps) {
             </ul>
           </div>
 
-          <div>
-            <p className="mb-4 text-sm uppercase tracking-viola text-viola-accent">
+          <div className="w-full max-w-[232px] shrink-0">
+            <p className="text-sm uppercase tracking-viola text-viola-accent">
               Help
             </p>
-            <ul className="space-y-2">
+            <ul className="mt-4 space-y-0">
               {footerHelpLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-base leading-[30px] tracking-viola-wide text-viola-text hover:text-viola-primary"
+                    className="block py-0.5 text-base leading-[30px] tracking-viola-wide text-viola-text hover:text-viola-primary"
                   >
                     {link.label}
                   </Link>
@@ -90,14 +105,14 @@ export function Footer({ categories }: FooterProps) {
             </ul>
           </div>
         </div>
-      </Container>
+      </div>
 
-      <div className="bg-viola-topbar">
-        <Container>
+      <div className="border-t border-viola-border bg-viola-topbar">
+        <div className="mx-auto w-full max-w-[1440px] px-4 md:px-8 xl:px-[100px]">
           <p className="py-2.5 text-center text-sm tracking-viola-wide text-viola-text">
             © {new Date().getFullYear()} {siteConfig.name}.
           </p>
-        </Container>
+        </div>
       </div>
     </footer>
   );
