@@ -26,7 +26,7 @@ export function ProductBreadcrumbs({
         <li aria-hidden="true">/</li>
         <li>
           <Link href="/collections" className="hover:text-viola-primary">
-            Shop
+            Collection
           </Link>
         </li>
         <li aria-hidden="true">/</li>

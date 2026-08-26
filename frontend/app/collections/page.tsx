@@ -1,14 +1,25 @@
-import { Container } from "@/components/layout/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import type { Metadata } from "next";
+import { CollectionPage } from "@/components/collection/CollectionPage";
+import { siteConfig } from "@/lib/config/site";
 
-export default function CollectionsIndexPage() {
+interface CollectionsIndexPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export const metadata: Metadata = {
+  title: "All Signature Collection",
+  description: `Browse all signature collections from ${siteConfig.name}.`,
+};
+
+export default async function CollectionsIndexPage({
+  searchParams,
+}: CollectionsIndexPageProps) {
+  const resolvedSearchParams = await searchParams;
+
   return (
-    <Container className="py-16">
-      <SectionHeading
-        title="Signature Collections"
-        description="Browse all Viola Patisserie collections."
-        align="left"
-      />
-    </Container>
+    <CollectionPage
+      activeCategorySlug={null}
+      searchParams={resolvedSearchParams}
+    />
   );
 }

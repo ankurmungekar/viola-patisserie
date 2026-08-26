@@ -37,9 +37,11 @@ export const footerHelpLinks = [
 
 export const signatureCategorySlugs = [
   "cakes",
-  "brownies",
   "macarons",
   "tea-cakes",
-  "cupcakes",
   "bento-cakes",
+  "cupcakes",
+  "floral-cupcakes",
+  "brownies",
+  "cheesecakes",
 ] as const;

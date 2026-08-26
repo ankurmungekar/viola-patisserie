@@ -172,6 +172,22 @@ export const mockCategories: Category[] = [
     image: { src: "/images/bento-cake-category.jpg", alt: "Bento Cakes" },
     count: 7,
   },
+  {
+    id: 7,
+    name: "Floral Cupcakes",
+    slug: "floral-cupcakes",
+    description: "Handcrafted floral cupcakes",
+    image: { src: DEFAULT_CATEGORY_IMAGE, alt: "Floral Cupcakes" },
+    count: 4,
+  },
+  {
+    id: 8,
+    name: "Cheesecakes",
+    slug: "cheesecakes",
+    description: "Creamy artisan cheesecakes",
+    image: { src: DEFAULT_CATEGORY_IMAGE, alt: "Cheesecakes" },
+    count: 6,
+  },
 ];
 
 export const mockProducts: Product[] = [

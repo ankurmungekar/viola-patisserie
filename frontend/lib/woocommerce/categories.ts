@@ -77,13 +77,40 @@ export async function getSignatureCategories(): Promise<Category[]> {
     )
     .map(mapCategory);
 
-  if (filtered.length === 0) {
+  const merged = signatureCategorySlugs.map((slug) => {
+    const fromApi = filtered.find((category) => category.slug === slug);
+    if (fromApi) {
+      return fromApi;
+    }
+
+    return mockCategories.find((category) => category.slug === slug);
+  }).filter((category): category is Category => Boolean(category));
+
+  if (merged.length === 0) {
     return mockCategories;
   }
 
-  return orderCategories(filtered);
+  return orderCategories(merged);
 }
 
 export async function getNavCategories(): Promise<Category[]> {
   return getSignatureCategories();
+}
+
+export async function getCategoryBySlug(slug: string): Promise<Category | null> {
+  const data = await safeStoreFetch<StoreCategory[]>({
+    path: "/products/categories",
+    searchParams: {
+      per_page: 100,
+      hide_empty: false,
+    },
+  });
+
+  const match = data?.find((category) => category.slug === slug);
+  if (match) {
+    return mapCategory(match);
+  }
+
+  const mock = mockCategories.find((category) => category.slug === slug);
+  return mock ?? null;
 }

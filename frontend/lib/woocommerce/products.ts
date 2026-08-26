@@ -54,7 +54,7 @@ interface StoreProductVariation {
   is_in_stock?: boolean;
 }
 
-interface StoreProduct {
+export interface StoreProduct {
   id: number;
   name: string;
   slug: string;
@@ -202,6 +202,10 @@ function mapProductDetail(
   };
 }
 
+export function mapStoreProductToProduct(product: StoreProduct): Product {
+  return mapProduct(product, mapVariations(product.variations));
+}
+
 function mapProduct(product: StoreProduct, variations: ProductVariation[]): Product {
   const detail = mapProductDetail(product, variations);
 
@@ -280,12 +284,12 @@ export async function getRelatedProducts(
   const categories = await safeStoreFetch<StoreProductCategory[]>({
     path: "/products/categories",
     searchParams: {
-      slug: categorySlug,
-      per_page: 1,
+      per_page: 100,
+      hide_empty: false,
     },
   });
 
-  const categoryId = categories?.[0]?.id;
+  const categoryId = categories?.find((category) => category.slug === categorySlug)?.id;
 
   if (!categoryId) {
     return mockProducts
@@ -315,17 +319,14 @@ export async function getRelatedProducts(
 }
 
 export async function getCategoryIdBySlug(slug: string): Promise<number | null> {
-  try {
-    const categories = await storeFetch<StoreProductCategory[]>({
-      path: "/products/categories",
-      searchParams: {
-        slug,
-        per_page: 1,
-      },
-    });
+  const categories = await safeStoreFetch<StoreProductCategory[]>({
+    path: "/products/categories",
+    searchParams: {
+      per_page: 100,
+      hide_empty: false,
+    },
+  });
 
-    return categories[0]?.id ?? null;
-  } catch {
-    return null;
-  }
+  const match = categories?.find((category) => category.slug === slug);
+  return match?.id ?? null;
 }
