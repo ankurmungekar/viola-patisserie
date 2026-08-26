@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Italianno, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
+import { cookies } from "next/headers";
 import { Footer } from "@/components/layout/Footer";
-import { Header } from "@/components/layout/Header";
+import { HeaderWithCart } from "@/components/layout/HeaderWithCart";
 import { siteConfig } from "@/lib/config/site";
+import { getHomepageContent } from "@/lib/wordpress/homepage";
+import {
+  CART_TOKEN_COOKIE,
+  getCartWithSession,
+  getItemsCountFromCart,
+} from "@/lib/woocommerce/cart-server";
 import { getNavCategories } from "@/lib/woocommerce/categories";
 
 const cormorant = Cormorant_Garamond({
@@ -48,7 +55,21 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const categories = await getNavCategories();
+  const [categories, homepage] = await Promise.all([
+    getNavCategories(),
+    getHomepageContent(),
+  ]);
+
+  let cartCount = 0;
+
+  try {
+    const cookieStore = await cookies();
+    const cartToken = cookieStore.get(CART_TOKEN_COOKIE)?.value;
+    const { cart } = await getCartWithSession(cartToken);
+    cartCount = getItemsCountFromCart(cart);
+  } catch {
+    cartCount = 0;
+  }
 
   return (
     <html
@@ -56,9 +77,13 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${cormorant.variable} ${sourceSans.variable} ${italianno.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-white text-viola-text">
-        <Header categories={categories} cartCount={0} />
+        <HeaderWithCart
+          categories={categories}
+          site={homepage.site}
+          initialCartCount={cartCount}
+        />
         <main className="flex-1 overflow-x-hidden pt-[136px]">{children}</main>
-        <Footer categories={categories} />
+        <Footer categories={categories} site={homepage.site} />
       </body>
     </html>
   );

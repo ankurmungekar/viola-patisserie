@@ -2,16 +2,16 @@ import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 interface CollectionPageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ categorySlug: string }>;
 }
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
-  const { slug } = await params;
+  const { categorySlug } = await params;
 
   return (
     <Container className="py-16">
       <SectionHeading
-        title={slug.replace(/-/g, " ")}
+        title={categorySlug.replace(/-/g, " ")}
         description="Collection page coming soon."
         align="left"
       />

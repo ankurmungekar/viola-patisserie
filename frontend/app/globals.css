@@ -83,3 +83,23 @@ body {
 .viola-category-carousel {
   overflow: hidden;
 }
+
+.product-gallery-thumbs .swiper-slide {
+  width: auto;
+  height: auto;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 0.2s ease;
+}
+
+.product-gallery-thumbs .swiper-slide-thumb-active {
+  opacity: 1;
+}
+
+.product-gallery-thumbs .swiper-slide-thumb-active > div {
+  border-color: var(--viola-primary);
+}
+
+.product-gallery-thumbs .swiper-slide > div {
+  width: 100%;
+}

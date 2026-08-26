@@ -1,14 +1,14 @@
 import Link from "next/link";
 
 interface AddToCartLinkProps {
-  productSlug: string;
+  permalink: string;
   productName: string;
 }
 
-export function AddToCartLink({ productSlug, productName }: AddToCartLinkProps) {
+export function AddToCartLink({ permalink, productName }: AddToCartLinkProps) {
   return (
     <Link
-      href={`/cakes/${productSlug}`}
+      href={permalink}
       className="text-base tracking-viola-wide text-viola-primary hover:underline"
       aria-label={`View ${productName} to add to cart`}
     >

@@ -7,6 +7,7 @@ import { OurStorySection } from "@/components/home/OurStorySection";
 import { SignatureCollectionSection } from "@/components/home/SignatureCollectionSection";
 import { ValuePropsSection } from "@/components/home/ValuePropsSection";
 import { siteConfig } from "@/lib/config/site";
+import { getHomepageContent } from "@/lib/wordpress/homepage";
 import { getSignatureCategories } from "@/lib/woocommerce/categories";
 import { getBestsellerProducts } from "@/lib/woocommerce/products";
 
@@ -24,20 +25,21 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const [categories, products] = await Promise.all([
+  const [categories, products, homepage] = await Promise.all([
     getSignatureCategories(),
     getBestsellerProducts(4),
+    getHomepageContent(),
   ]);
 
   return (
     <>
-      <HeroBanner />
+      <HeroBanner content={homepage.hero} />
       <SignatureCollectionSection categories={categories} />
       <BestsellersSection products={products} />
-      <OurStorySection />
-      <ValuePropsSection />
-      <CustomCakesSection />
-      <InstagramSection />
+      <OurStorySection content={homepage.ourStory} />
+      <ValuePropsSection valueProps={homepage.valueProps} />
+      <CustomCakesSection content={homepage.customCakes} />
+      <InstagramSection content={homepage.instagram} />
     </>
   );
 }

@@ -12,15 +12,17 @@ import {
   StoreIcon,
   UserIcon,
 } from "@/components/icons";
-import { mainNavLinks, siteConfig } from "@/lib/config/site";
+import { mainNavLinks } from "@/lib/config/site";
 import type { Category } from "@/types/category";
+import type { SiteContent } from "@/types/homepage";
 
 interface HeaderProps {
   categories: Category[];
+  site: SiteContent;
   cartCount?: number;
 }
 
-export function Header({ categories, cartCount = 0 }: HeaderProps) {
+export function Header({ categories, site, cartCount = 0 }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collectionsOpen, setCollectionsOpen] = useState(false);
 
@@ -30,21 +32,21 @@ export function Header({ categories, cartCount = 0 }: HeaderProps) {
         <div className="mx-auto flex h-10 max-w-[1440px] items-center justify-end gap-3 px-4 md:px-8 xl:px-[100px]">
           <StoreIcon />
           <p className="text-sm tracking-viola-wide text-viola-text">
-            {siteConfig.topBarMessage}
+            {site.topBarMessage}
             <span className="mx-3 hidden sm:inline" aria-hidden="true">
               |
             </span>
-            <span className="hidden sm:inline">{siteConfig.phoneDisplay}</span>
+            <span className="hidden sm:inline">{site.phoneDisplay}</span>
           </p>
         </div>
       </div>
 
       <div className="border-b border-viola-border bg-white">
         <div className="mx-auto flex h-24 max-w-[1440px] items-center justify-between px-4 md:px-8 xl:px-[100px]">
-          <Link href="/" className="shrink-0" aria-label={`${siteConfig.name} home`}>
+          <Link href="/" className="shrink-0" aria-label={`${site.name} home`}>
             <Image
               src="/images/logo.svg"
-              alt={siteConfig.name}
+              alt={site.name}
               width={130}
               height={93}
               priority
