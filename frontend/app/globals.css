@@ -11,6 +11,8 @@
   --viola-category-bg: #eaddd2;
   --viola-hero-from: #dfcde4;
   --viola-hero-to: #f4f0f2;
+  --viola-about-highlight: #e8d6e2;
+  --viola-about-signature: #fdebe1;
 }
 
 @theme inline {
@@ -57,6 +59,14 @@ body {
 
   .category-card-gradient {
     background: linear-gradient(180deg, #eaded3 0%, #e7d7c8 100%);
+  }
+
+  .about-highlight-bg {
+    background-color: var(--viola-about-highlight);
+  }
+
+  .about-founder-signature {
+    background-color: var(--viola-about-signature);
   }
 }
 

@@ -177,3 +177,37 @@ export function GiftBoxIcon() {
     </svg>
   );
 }
+
+interface CakeIconProps {
+  className?: string;
+}
+
+export function CakeIcon({ className }: CakeIconProps) {
+  return (
+    <svg
+      viewBox="0 0 60 60"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+    >
+      <path
+        d="M6.7 29.3h46.7M9.3 24.6h41.3M11.3 18.5h37.3M28.3 6.7v12.6"
+        stroke="#8D0CA2"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M17.3 24.6c0-4.7 3.8-8.5 8.5-8.5s8.5 3.8 8.5 8.5"
+        stroke="#8D0CA2"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6 29.3v22.7c0 1.1.9 2 2 2h40c1.1 0 2-.9 2-2V29.3H6Z"
+        stroke="#8D0CA2"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}

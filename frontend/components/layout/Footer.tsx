@@ -108,7 +108,8 @@ export function Footer({ categories, site }: FooterProps) {
       <div className="border-t border-viola-border bg-viola-topbar">
         <div className="mx-auto w-full max-w-[1440px] px-4 md:px-8 xl:px-[100px]">
           <p className="py-2.5 text-center text-sm tracking-viola-wide text-viola-text">
-            © {new Date().getFullYear()} {site.name}.
+            © <span suppressHydrationWarning>{new Date().getFullYear()}</span>{" "}
+            {site.name}.
           </p>
         </div>
       </div>

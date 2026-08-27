@@ -1,4 +1,5 @@
 import { homepageDefaults } from "@/lib/config/homepage-defaults";
+import { normalizeWordPressImageUrl } from "@/lib/wordpress/images";
 import { siteConfig } from "@/lib/config/site";
 import { getWordPressUrl } from "@/lib/woocommerce/client";
 import type {
@@ -18,7 +19,7 @@ function resolveImage(
 ): HomepageImage {
   if (image?.src) {
     return {
-      src: image.src,
+      src: normalizeWordPressImageUrl(image.src),
       alt: image.alt || fallback.alt,
     };
   }

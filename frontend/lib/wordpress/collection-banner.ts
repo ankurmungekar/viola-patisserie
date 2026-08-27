@@ -1,4 +1,5 @@
 import { collectionBannerDefaults } from "@/lib/config/collection-banner-defaults";
+import { normalizeWordPressImageUrl } from "@/lib/wordpress/images";
 import { getWordPressUrl } from "@/lib/woocommerce/client";
 import type { PromoBannerContent, PromoBannerImage } from "@/types/promo-banner";
 
@@ -8,7 +9,7 @@ function resolveImage(
 ): PromoBannerImage {
   if (image?.src) {
     return {
-      src: image.src,
+      src: normalizeWordPressImageUrl(image.src),
       alt: image.alt || fallback.alt,
     };
   }
