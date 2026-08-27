@@ -84,11 +84,29 @@ viola-patisserie/
 
 ## Current scope
 
-Homepage implementation with:
+Implemented storefront features:
 
-- Fixed header and footer
-- Hero, signature collections, bestsellers, value props, custom cakes CTA, our story
-- WooCommerce-driven categories and products with mock fallback
-- Responsive layout inferred from desktop Figma design
+- Homepage with hero, signature collections, bestsellers, value props, custom cakes CTA, and our story
+- Collections listing with filters, sort, and promo banner
+- Product detail page with delivery validation, cake message, and add-to-cart
+- About page (CMS-driven via WordPress)
+- Cart page with line-item review, quantity updates, and delivery metadata display
+- Checkout with billing/contact form and Razorpay payment
+- WooCommerce Store API cart session and Viola delivery REST APIs
 
-Deferred: product detail page, cart session, checkout, Razorpay, delivery plugin APIs.
+### WordPress setup for checkout
+
+1. Enable **Razorpay** under WooCommerce → Settings → Payments
+2. Add Razorpay credentials to `wp-config.php`:
+   ```php
+   define('RAZORPAY_KEY_ID', 'your_key_id');
+   define('RAZORPAY_KEY_SECRET', 'your_key_secret');
+   define('RAZORPAY_WEBHOOK_SECRET', 'your_webhook_secret');
+   ```
+3. Configure a shipping method (e.g. Flat rate) in WooCommerce shipping zones
+
+### Frontend env for Razorpay.js
+
+Set `NEXT_PUBLIC_RAZORPAY_KEY_ID` in `frontend/.env.local` (public key only).
+
+Deferred: contact page, custom cakes page, legal/help pages, search, and account.

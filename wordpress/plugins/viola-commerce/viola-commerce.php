@@ -28,6 +28,9 @@ require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/delivery-defaults.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-delivery-rest-api.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-delivery-settings.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/cart-extensions.php';
+require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-razorpay-gateway.php';
+require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-checkout-rest-api.php';
+require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-razorpay-webhook.php';
 
 function viola_commerce_init(): void
 {
@@ -44,6 +47,12 @@ function viola_commerce_init(): void
     $delivery_api->register();
 
     viola_commerce_register_cart_hooks();
+
+    $checkout_api = new Viola_Commerce_Checkout_Rest_Api();
+    $checkout_api->register();
+
+    $razorpay_webhook = new Viola_Commerce_Razorpay_Webhook();
+    $razorpay_webhook->register();
 
     if (is_admin()) {
         $homepage_settings = new Viola_Commerce_Homepage_Settings();

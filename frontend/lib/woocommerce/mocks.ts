@@ -33,7 +33,13 @@ const classicTruffleDetail: ProductDetail = {
   attributes: [
     {
       name: "Weight",
-      options: ["500 g", "1Kg", "1.5Kg", "2Kg"],
+      taxonomy: "",
+      options: [
+        { name: "500 g", slug: "500-g" },
+        { name: "1Kg", slug: "1kg" },
+        { name: "1.5Kg", slug: "1-5kg" },
+        { name: "2Kg", slug: "2kg" },
+      ],
     },
   ],
   variations: [

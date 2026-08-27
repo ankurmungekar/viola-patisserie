@@ -110,10 +110,16 @@ function mapCategories(categories: StoreProductCategory[] = []): ProductCategory
 }
 
 function mapAttributes(attributes: StoreProductAttribute[] = []): ProductAttribute[] {
-  return attributes.map((attribute) => ({
-    name: attribute.name,
-    options: attribute.terms.map((term) => term.name),
-  }));
+  return attributes
+    .filter((attribute) => attribute.has_variations)
+    .map((attribute) => ({
+      name: attribute.name,
+      taxonomy: attribute.taxonomy,
+      options: attribute.terms.map((term) => ({
+        name: term.name,
+        slug: term.slug,
+      })),
+    }));
 }
 
 function mapVariations(variations: StoreProductVariation[] = []): ProductVariation[] {
@@ -329,4 +335,22 @@ export async function getCategoryIdBySlug(slug: string): Promise<number | null> 
 
   const match = categories?.find((category) => category.slug === slug);
   return match?.id ?? null;
+}
+
+export async function getProductSitemapPaths(): Promise<string[]> {
+  const products = await safeStoreFetch<StoreProduct[]>({
+    path: "/products",
+    searchParams: {
+      per_page: 100,
+    },
+    revalidate: 3600,
+  });
+
+  if (!products || products.length === 0) {
+    return mockProducts.map((product) => product.permalink);
+  }
+
+  return products.map((product) =>
+    buildProductPermalink(product.slug, mapCategories(product.categories)),
+  );
 }

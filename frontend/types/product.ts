@@ -16,9 +16,15 @@ export interface ProductVariation {
   inStock: boolean;
 }
 
+export interface ProductAttributeOption {
+  name: string;
+  slug: string;
+}
+
 export interface ProductAttribute {
   name: string;
-  options: string[];
+  taxonomy: string;
+  options: ProductAttributeOption[];
 }
 
 export interface Product {

@@ -202,10 +202,50 @@ function viola_commerce_persist_order_line_item_meta($item, string $cart_item_ke
     }
 }
 
+function viola_commerce_copy_delivery_meta_to_order($order, $data): void
+{
+    if (!is_object($order) || !method_exists($order, 'get_id')) {
+        return;
+    }
+
+    $pincode = '';
+    $delivery_date = '';
+    $delivery_slot = '';
+    $delivery_zone = '';
+
+    foreach ($order->get_items() as $item) {
+        if (!is_object($item) || !method_exists($item, 'get_meta')) {
+            continue;
+        }
+
+        $pincode = $pincode !== '' ? $pincode : (string) $item->get_meta('Delivery Pincode');
+        $delivery_date = $delivery_date !== '' ? $delivery_date : (string) $item->get_meta('Delivery Date');
+        $delivery_slot = $delivery_slot !== '' ? $delivery_slot : (string) $item->get_meta('Delivery Slot');
+        $delivery_zone = $delivery_zone !== '' ? $delivery_zone : (string) $item->get_meta('Delivery Zone');
+    }
+
+    if ($pincode !== '') {
+        $order->update_meta_data('_viola_delivery_pincode', $pincode);
+    }
+
+    if ($delivery_date !== '') {
+        $order->update_meta_data('_viola_delivery_date', $delivery_date);
+    }
+
+    if ($delivery_slot !== '') {
+        $order->update_meta_data('_viola_delivery_slot', $delivery_slot);
+    }
+
+    if ($delivery_zone !== '') {
+        $order->update_meta_data('_viola_delivery_zone', $delivery_zone);
+    }
+}
+
 function viola_commerce_register_cart_hooks(): void
 {
     add_action('woocommerce_blocks_loaded', 'viola_commerce_register_cart_extension');
     add_filter('woocommerce_store_api_add_to_cart_data', 'viola_commerce_store_api_add_to_cart_data', 10, 2);
     add_filter('woocommerce_store_api_product_response', 'viola_commerce_store_api_product_response', 10, 2);
     add_action('woocommerce_checkout_create_order_line_item', 'viola_commerce_persist_order_line_item_meta', 10, 3);
+    add_action('woocommerce_checkout_create_order', 'viola_commerce_copy_delivery_meta_to_order', 10, 2);
 }

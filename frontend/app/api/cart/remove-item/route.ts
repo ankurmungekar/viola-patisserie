@@ -1,30 +1,25 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import {
-  addItemToCart,
   applyCartSessionCookies,
   getCartSessionFromCookies,
   getItemsCountFromCart,
+  mapStoreCartToCart,
+  removeCartItem,
 } from "@/lib/woocommerce/cart-server";
 
-interface AddItemBody {
-  id: number;
-  quantity: number;
-  variation?: { attribute: string; value: string }[];
-  cakeMessage?: string;
-  deliveryPincode?: string;
-  deliveryDate?: string;
-  deliverySlot?: string;
-  deliveryZone?: string;
+interface RemoveItemBody {
+  key: string;
 }
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as AddItemBody;
+    const body = (await request.json()) as RemoveItemBody;
     const cookieStore = await cookies();
     const session = await getCartSessionFromCookies(cookieStore);
-    const result = await addItemToCart(session, body);
+    const result = await removeCartItem(session, body.key);
     const response = NextResponse.json({
+      cart: mapStoreCartToCart(result.cart),
       itemsCount: getItemsCountFromCart(result.cart),
     });
 
@@ -34,7 +29,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         message:
-          error instanceof Error ? error.message : "Failed to add item to cart",
+          error instanceof Error ? error.message : "Failed to remove cart item",
       },
       { status: 400 },
     );

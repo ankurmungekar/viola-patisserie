@@ -1,24 +1,34 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import {
-  CART_TOKEN_COOKIE,
   applyCartSessionCookies,
+  getCartSessionFromCookies,
   getCartWithSession,
   getItemsCountFromCart,
+  mapStoreCartToCart,
 } from "@/lib/woocommerce/cart-server";
 
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const cartToken = cookieStore.get(CART_TOKEN_COOKIE)?.value;
-    const { session, cart } = await getCartWithSession(cartToken);
+    const session = await getCartSessionFromCookies(cookieStore);
+    const { session: nextSession, cart } = await getCartWithSession(
+      session.cartToken,
+      session.nonce,
+    );
+    const mappedCart = mapStoreCartToCart(cart);
     const response = NextResponse.json({
+      cart: mappedCart,
       itemsCount: getItemsCountFromCart(cart),
     });
 
-    applyCartSessionCookies(response, session);
+    applyCartSessionCookies(response, nextSession);
     return response;
   } catch {
-    return NextResponse.json({ itemsCount: 0 });
+    const emptyCart = mapStoreCartToCart({ items: [] });
+    return NextResponse.json({
+      cart: emptyCart,
+      itemsCount: 0,
+    });
   }
 }

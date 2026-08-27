@@ -8,6 +8,14 @@ import { QuantityStepper } from "@/components/product/QuantityStepper";
 import { StorageInstructions } from "@/components/product/StorageInstructions";
 import { WeightSelector } from "@/components/product/WeightSelector";
 import { addToCart } from "@/lib/woocommerce/cart";
+import {
+  buildCartVariationPayload,
+  findMatchingVariation,
+  getInitialAttributeSelections,
+  getVariationAttributes,
+  getVisibleVariationAttributes,
+  resolveCartAttributeSelections,
+} from "@/lib/woocommerce/variation-attributes";
 import type { ProductDetail } from "@/types/product";
 
 interface ProductPurchaseFormProps {
@@ -16,12 +24,12 @@ interface ProductPurchaseFormProps {
 }
 
 function getWeightOptions(product: ProductDetail): string[] {
-  const weightAttribute = product.attributes.find(
+  const weightAttribute = getVisibleVariationAttributes(product.attributes).find(
     (attribute) => attribute.name.toLowerCase() === "weight",
   );
 
   if (weightAttribute?.options.length) {
-    return weightAttribute.options;
+    return weightAttribute.options.map((option) => option.name);
   }
 
   if (product.variations.length > 0) {
@@ -37,9 +45,11 @@ export function ProductPurchaseForm({
   product,
   className = "",
 }: ProductPurchaseFormProps) {
+  const variationAttributes = getVariationAttributes(product.attributes);
+  const visibleAttributes = getVisibleVariationAttributes(product.attributes);
   const weightOptions = getWeightOptions(product);
-  const [selectedWeight, setSelectedWeight] = useState(
-    weightOptions[0] ?? "",
+  const [selectedAttributes, setSelectedAttributes] = useState(() =>
+    getInitialAttributeSelections(visibleAttributes),
   );
   const [cakeMessage, setCakeMessage] = useState("");
   const [pincode, setPincode] = useState("");
@@ -54,21 +64,24 @@ export function ProductPurchaseForm({
     message: string;
   } | null>(null);
 
+  const weightAttribute = visibleAttributes.find(
+    (attribute) => attribute.name.toLowerCase() === "weight",
+  );
+  const selectedWeight = weightAttribute
+    ? (selectedAttributes[weightAttribute.name] ?? weightOptions[0] ?? "")
+    : (weightOptions[0] ?? "");
+
   const selectedVariation = useMemo(() => {
     if (product.type === "variable") {
-      return (
-        product.variations.find((variation) =>
-          variation.attributes.some(
-            (attribute) =>
-              attribute.name.toLowerCase() === "weight" &&
-              attribute.value === selectedWeight,
-          ),
-        ) ?? product.variations[0]
+      return findMatchingVariation(
+        product.variations,
+        visibleAttributes,
+        selectedAttributes,
       );
     }
 
     return product.variations[0] ?? null;
-  }, [product, selectedWeight]);
+  }, [product, selectedAttributes, visibleAttributes]);
 
   const displayPrice =
     selectedVariation?.priceHtml ||
@@ -83,6 +96,21 @@ export function ProductPurchaseForm({
     quantity >= 1 &&
     !submitting;
 
+  function updateWeightSelection(value: string) {
+    const weightAttribute = visibleAttributes.find(
+      (attribute) => attribute.name.toLowerCase() === "weight",
+    );
+
+    if (!weightAttribute) {
+      return;
+    }
+
+    setSelectedAttributes((current) => ({
+      ...current,
+      [weightAttribute.name]: value,
+    }));
+  }
+
   async function handleAddToCart() {
     if (!selectedVariation || !canSubmit) {
       return;
@@ -92,9 +120,18 @@ export function ProductPurchaseForm({
     setFeedback(null);
 
     try {
+      const cartSelections = resolveCartAttributeSelections(
+        variationAttributes,
+        selectedAttributes,
+        selectedVariation,
+      );
       const result = await addToCart({
         id: selectedVariation.id,
         quantity,
+        variation: buildCartVariationPayload(
+          variationAttributes,
+          cartSelections,
+        ),
         cakeMessage,
         deliveryPincode: pincode,
         deliveryDate,
@@ -146,7 +183,7 @@ export function ProductPurchaseForm({
           <WeightSelector
             options={weightOptions}
             selected={selectedWeight}
-            onChange={setSelectedWeight}
+            onChange={updateWeightSelection}
           />
         ) : null}
 
