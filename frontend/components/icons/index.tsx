@@ -74,6 +74,35 @@ export function StoreIcon() {
   );
 }
 
+export function CalendarIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <rect x="3" y="4" width="14" height="13" rx="1" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M3 8h14M7 2v3M13 2v3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function ClockIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M10 6v4l3 2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function CartTruckIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M2 4h11v9H2V4Z" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M13 6h3l2 3v4h-5V6Z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+      <circle cx="6" cy="14.5" r="1.5" stroke="currentColor" strokeWidth="1.2" />
+      <circle cx="15" cy="14.5" r="1.5" stroke="currentColor" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
 export function EyeIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">

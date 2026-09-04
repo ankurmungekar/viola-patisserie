@@ -28,11 +28,14 @@ export interface CartItem {
 export interface CartTotals {
   subtotal: string;
   shipping: string;
+  tax: string;
   total: string;
   subtotalMinor: number;
   shippingMinor: number;
+  taxMinor: number;
   totalMinor: number;
   currencyCode: string;
+  taxLabel: string;
 }
 
 export interface Cart {

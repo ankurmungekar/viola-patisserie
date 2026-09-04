@@ -77,24 +77,28 @@ function viola_commerce_store_api_add_to_cart_data(array $add_to_cart_data, $req
         return $add_to_cart_data;
     }
 
+    if (!isset($add_to_cart_data['cart_item_data']) || !is_array($add_to_cart_data['cart_item_data'])) {
+        $add_to_cart_data['cart_item_data'] = [];
+    }
+
     if (!empty($viola_extensions['cake_message'])) {
-        $add_to_cart_data['viola_cake_message'] = sanitize_text_field((string) $viola_extensions['cake_message']);
+        $add_to_cart_data['cart_item_data']['viola_cake_message'] = sanitize_text_field((string) $viola_extensions['cake_message']);
     }
 
     if (!empty($viola_extensions['delivery_pincode'])) {
-        $add_to_cart_data['viola_delivery_pincode'] = sanitize_text_field((string) $viola_extensions['delivery_pincode']);
+        $add_to_cart_data['cart_item_data']['viola_delivery_pincode'] = sanitize_text_field((string) $viola_extensions['delivery_pincode']);
     }
 
     if (!empty($viola_extensions['delivery_date'])) {
-        $add_to_cart_data['viola_delivery_date'] = sanitize_text_field((string) $viola_extensions['delivery_date']);
+        $add_to_cart_data['cart_item_data']['viola_delivery_date'] = sanitize_text_field((string) $viola_extensions['delivery_date']);
     }
 
     if (!empty($viola_extensions['delivery_slot'])) {
-        $add_to_cart_data['viola_delivery_slot'] = sanitize_text_field((string) $viola_extensions['delivery_slot']);
+        $add_to_cart_data['cart_item_data']['viola_delivery_slot'] = sanitize_text_field((string) $viola_extensions['delivery_slot']);
     }
 
     if (!empty($viola_extensions['delivery_zone'])) {
-        $add_to_cart_data['viola_delivery_zone'] = sanitize_text_field((string) $viola_extensions['delivery_zone']);
+        $add_to_cart_data['cart_item_data']['viola_delivery_zone'] = sanitize_text_field((string) $viola_extensions['delivery_zone']);
     }
 
     return $add_to_cart_data;
@@ -243,7 +247,12 @@ function viola_commerce_copy_delivery_meta_to_order($order, $data): void
 
 function viola_commerce_register_cart_hooks(): void
 {
-    add_action('woocommerce_blocks_loaded', 'viola_commerce_register_cart_extension');
+    if (did_action('woocommerce_blocks_loaded')) {
+        viola_commerce_register_cart_extension();
+    } else {
+        add_action('woocommerce_blocks_loaded', 'viola_commerce_register_cart_extension');
+    }
+
     add_filter('woocommerce_store_api_add_to_cart_data', 'viola_commerce_store_api_add_to_cart_data', 10, 2);
     add_filter('woocommerce_store_api_product_response', 'viola_commerce_store_api_product_response', 10, 2);
     add_action('woocommerce_checkout_create_order_line_item', 'viola_commerce_persist_order_line_item_meta', 10, 3);

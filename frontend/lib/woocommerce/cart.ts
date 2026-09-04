@@ -118,6 +118,30 @@ export async function updateCartItem(
   return result;
 }
 
+export async function updateCartDeliverySchedule(payload: {
+  deliveryDate: string;
+  deliverySlot: string;
+  deliveryPincode?: string;
+  deliveryZone?: string;
+}): Promise<CartResponse> {
+  const response = await fetch("/api/cart/update-delivery", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
+
+  const result = (await response.json()) as CartResponse;
+  dispatchCartUpdated(result.itemsCount);
+  return result;
+}
+
 export async function removeCartItem(key: string): Promise<CartResponse> {
   const response = await fetch("/api/cart/remove-item", {
     method: "POST",

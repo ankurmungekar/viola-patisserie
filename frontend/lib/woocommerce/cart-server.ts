@@ -47,6 +47,7 @@ interface StoreCartItem {
 interface StoreCartTotals {
   total_items?: string;
   total_shipping?: string;
+  total_tax?: string;
   total_price?: string;
   currency_code?: string;
   currency_minor_unit?: number;
@@ -125,17 +126,31 @@ function mapCartItem(item: StoreCartItem): CartItem {
 export function mapStoreCartToCart(cart: StoreCart): Cart {
   const minorUnit = cart.totals?.currency_minor_unit ?? 2;
   const items = (cart.items ?? []).map(mapCartItem);
+  const subtotalMinor = parseMinorUnits(cart.totals?.total_items, minorUnit);
+  const shippingMinor = parseMinorUnits(cart.totals?.total_shipping, minorUnit);
+  const totalMinor = parseMinorUnits(cart.totals?.total_price, minorUnit);
+  const taxMinor =
+    parseMinorUnits(cart.totals?.total_tax, minorUnit) ||
+    Math.max(0, totalMinor - subtotalMinor - shippingMinor);
+  const taxRate =
+    subtotalMinor > 0 ? Math.round((taxMinor / subtotalMinor) * 100) : 18;
 
   return {
     items,
     totals: {
       subtotal: formatMinorUnits(cart.totals?.total_items, minorUnit),
       shipping: formatMinorUnits(cart.totals?.total_shipping, minorUnit),
+      tax:
+        parseMinorUnits(cart.totals?.total_tax, minorUnit) > 0
+          ? formatMinorUnits(cart.totals?.total_tax, minorUnit)
+          : formatPrice(taxMinor),
       total: formatMinorUnits(cart.totals?.total_price, minorUnit),
-      subtotalMinor: parseMinorUnits(cart.totals?.total_items, minorUnit),
-      shippingMinor: parseMinorUnits(cart.totals?.total_shipping, minorUnit),
-      totalMinor: parseMinorUnits(cart.totals?.total_price, minorUnit),
+      subtotalMinor,
+      shippingMinor,
+      taxMinor,
+      totalMinor,
       currencyCode: cart.totals?.currency_code ?? "INR",
+      taxLabel: taxMinor > 0 ? `Taxes (${taxRate}%)` : "Taxes (18%)",
     },
     itemsCount: cart.items_count ?? getItemsCount(cart),
     needsShipping: cart.needs_shipping ?? false,
@@ -309,6 +324,52 @@ export async function updateCartItem(
     session: result.session,
     cart: result.data,
   };
+}
+
+export async function updateCartDeliverySchedule(
+  session: CartSession,
+  payload: {
+    deliveryDate: string;
+    deliverySlot: string;
+    deliveryPincode?: string;
+    deliveryZone?: string;
+  },
+): Promise<void> {
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  };
+
+  if (session.cartToken) {
+    headers["Cart-Token"] = session.cartToken;
+  }
+
+  if (session.nonce) {
+    headers.Nonce = session.nonce;
+  }
+
+  const response = await fetch(
+    new URL(
+      "/wp-json/viola/v1/cart/delivery-schedule",
+      getWordPressUrl(),
+    ).toString(),
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        delivery_date: payload.deliveryDate,
+        delivery_slot: payload.deliverySlot,
+        delivery_pincode: payload.deliveryPincode ?? "",
+        delivery_zone: payload.deliveryZone ?? "",
+      }),
+      cache: "no-store",
+    },
+  );
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(errorBody || `Delivery update error: ${response.status}`);
+  }
 }
 
 export async function removeCartItem(

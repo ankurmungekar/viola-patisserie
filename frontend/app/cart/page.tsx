@@ -31,14 +31,9 @@ export default async function CartPage() {
   }
 
   return (
-    <section className="py-8 md:py-12">
+    <section className="py-8 md:py-10">
       <div className="mx-auto w-full max-w-[1440px] px-4 md:px-8 xl:px-[100px]">
-        <h1 className="font-display text-4xl font-semibold text-viola-text md:text-5xl">
-          Your Cart
-        </h1>
-        <div className="mt-8">
-          <CartPageClient initialCart={cart} />
-        </div>
+        <CartPageClient initialCart={cart} />
       </div>
     </section>
   );

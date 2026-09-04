@@ -10,28 +10,14 @@ import type { CartItem } from "@/types/cart";
 interface CartLineItemProps {
   item: CartItem;
   onUpdated: () => Promise<void>;
+  showDivider?: boolean;
 }
 
-function DeliveryMetaRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  if (!value) {
-    return null;
-  }
-
-  return (
-    <p>
-      <span className="text-viola-text/70">{label}: </span>
-      {value}
-    </p>
-  );
-}
-
-export function CartLineItem({ item, onUpdated }: CartLineItemProps) {
+export function CartLineItem({
+  item,
+  onUpdated,
+  showDivider = true,
+}: CartLineItemProps) {
   const [quantity, setQuantity] = useState(item.quantity);
   const [updating, setUpdating] = useState(false);
   const [removing, setRemoving] = useState(false);
@@ -76,83 +62,62 @@ export function CartLineItem({ item, onUpdated }: CartLineItemProps) {
   }
 
   return (
-    <article className="grid gap-4 border-b border-viola-border py-6 md:grid-cols-[120px_minmax(0,1fr)] md:gap-6">
-      <div className="relative aspect-square w-full max-w-[120px] overflow-hidden bg-viola-category-bg">
-        {item.image.src ? (
-          <Image
-            src={item.image.src}
-            alt={item.image.alt}
-            fill
-            className="object-cover"
-            sizes="120px"
-          />
-        ) : null}
-      </div>
+    <article className={showDivider ? "border-b border-viola-border pb-10" : ""}>
+      <div className="flex gap-5">
+        <div className="relative h-[190px] w-[190px] shrink-0 overflow-hidden bg-viola-category-bg">
+          {item.image.src ? (
+            <Image
+              src={item.image.src}
+              alt={item.image.alt}
+              fill
+              className="object-cover"
+              sizes="190px"
+            />
+          ) : null}
+        </div>
 
-      <div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            {item.permalink ? (
-              <Link
-                href={item.permalink}
-                className="font-display text-2xl font-semibold text-viola-text hover:text-viola-primary"
-              >
-                {item.name}
-              </Link>
-            ) : (
-              <h3 className="font-display text-2xl font-semibold text-viola-text">
-                {item.name}
-              </h3>
-            )}
-            <p className="mt-1 text-base tracking-viola-wide text-viola-accent">
-              {item.unitPrice}
-            </p>
-          </div>
-          <p className="text-lg tracking-viola-wide text-viola-text">
-            {item.lineTotal}
+        <div className="flex min-w-0 flex-1 flex-col pt-0.5">
+          {item.permalink ? (
+            <Link
+              href={item.permalink}
+              className="text-lg leading-[18px] tracking-viola-wide text-viola-text hover:text-viola-primary"
+            >
+              {item.name}
+            </Link>
+          ) : (
+            <h3 className="text-lg leading-[18px] tracking-viola-wide text-viola-text">
+              {item.name}
+            </h3>
+          )}
+
+          <p className="mt-5 text-lg font-semibold leading-5 tracking-viola-wide text-viola-text">
+            {item.unitPrice}
           </p>
-        </div>
 
-        <div className="mt-4 space-y-1 text-sm tracking-viola-wide text-viola-text">
-          <DeliveryMetaRow
-            label="Pincode"
-            value={item.extensions.deliveryPincode}
-          />
-          <DeliveryMetaRow
-            label="Delivery date"
-            value={item.extensions.deliveryDate}
-          />
-          <DeliveryMetaRow
-            label="Delivery slot"
-            value={item.extensions.deliverySlot}
-          />
-          <DeliveryMetaRow
-            label="Cake message"
-            value={item.extensions.cakeMessage}
-          />
-        </div>
+          <div className="mt-5">
+            <QuantityStepper
+              value={quantity}
+              onChange={handleQuantityChange}
+              min={1}
+              size="compact"
+            />
+          </div>
 
-        <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <QuantityStepper
-            value={quantity}
-            onChange={handleQuantityChange}
-            min={1}
-          />
           <button
             type="button"
             onClick={handleRemove}
             disabled={removing || updating}
-            className="text-sm tracking-viola-wide text-viola-text/70 underline-offset-2 hover:text-red-600 hover:underline disabled:opacity-50"
+            className="mt-8 w-fit text-base tracking-viola-wide text-viola-primary hover:underline disabled:opacity-50"
           >
             {removing ? "Removing..." : "Remove"}
           </button>
-        </div>
 
-        {error ? (
-          <p className="mt-3 text-sm tracking-viola-wide text-red-600">
-            {error}
-          </p>
-        ) : null}
+          {error ? (
+            <p className="mt-3 text-sm tracking-viola-wide text-red-600">
+              {error}
+            </p>
+          ) : null}
+        </div>
       </div>
     </article>
   );
