@@ -25,3 +25,6 @@ wordpress/uploads/
 # Docker
 db_data/
 wp_data/
+
+# Local → live migration dumps (not for git)
+.migration/

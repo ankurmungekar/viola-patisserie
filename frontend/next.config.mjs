@@ -1,4 +1,5 @@
-import type { NextConfig } from "next";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const wordpressUrlString =
   process.env.NEXT_PUBLIC_WORDPRESS_URL ?? "http://localhost:8080";
@@ -14,7 +15,12 @@ try {
   // Keep localhost fallback when env is invalid during build.
 }
 
-const nextConfig: NextConfig = {
+const configDir = path.dirname(fileURLToPath(import.meta.url));
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // Hostinger's parent folders can contain extra lockfiles; pin tracing to this app.
+  outputFileTracingRoot: configDir,
   async redirects() {
     return [
       {
