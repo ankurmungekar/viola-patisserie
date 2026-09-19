@@ -37,7 +37,7 @@ export function InstagramSection({ content }: InstagramSectionProps) {
           </div>
 
           <div className="min-w-0 flex-1 overflow-x-auto lg:overflow-visible">
-            <div className="grid w-max grid-cols-3 gap-5 lg:w-full">
+            <div className="reveal-stagger grid w-max grid-cols-3 gap-5 lg:w-full">
               {posts.map(({ id, views, url, image }) => (
                 <Link
                   key={id}

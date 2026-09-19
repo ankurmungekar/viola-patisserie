@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { HeroCopy } from "@/components/home/HeroCopy";
 import { Button } from "@/components/ui/Button";
 import type { HeroContent } from "@/types/homepage";
 
@@ -25,7 +26,7 @@ export function HeroBanner({ content }: HeroBannerProps) {
           alt={image.alt}
           fill
           priority
-          className="object-cover"
+          className="hero-media object-cover"
           style={{ objectPosition: "right center" }}
           sizes="100vw"
         />
@@ -36,7 +37,7 @@ export function HeroBanner({ content }: HeroBannerProps) {
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-[420px] w-full max-w-[1440px] items-center px-4 py-12 md:min-h-[664px] md:px-8 md:py-16 xl:px-[100px]">
-        <div className="max-w-2xl">
+        <HeroCopy>
           <p className="mb-4 flex flex-wrap items-center gap-3 text-sm uppercase tracking-viola text-viola-accent">
             {eyebrowTags.map((tag, index) => (
               <span key={tag} className="contents">
@@ -63,7 +64,7 @@ export function HeroBanner({ content }: HeroBannerProps) {
           <div className="mt-8">
             <Button href={ctaUrl}>{ctaLabel}</Button>
           </div>
-        </div>
+        </HeroCopy>
       </div>
     </section>
   );

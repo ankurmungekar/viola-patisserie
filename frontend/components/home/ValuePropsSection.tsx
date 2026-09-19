@@ -9,7 +9,7 @@ export function ValuePropsSection({ valueProps }: ValuePropsSectionProps) {
   return (
     <section className="bg-white py-16 md:py-20" aria-label="Why Viola Patisserie">
       <div className="mx-auto w-full max-w-[1440px] px-4 md:px-8 xl:px-[100px]">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 xl:grid-cols-4 xl:gap-0">
+        <div className="reveal-stagger grid grid-cols-1 gap-10 sm:grid-cols-2 xl:grid-cols-4 xl:gap-0">
           {valueProps.map(({ title, description, icon }, index) => {
             const Icon = valuePropIconMap[icon] ?? valuePropIconMap.badge;
 

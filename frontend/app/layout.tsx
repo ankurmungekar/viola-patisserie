@@ -77,12 +77,15 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`${cormorant.variable} ${sourceSans.variable} ${italianno.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-white text-viola-text">
+        <noscript>
+          <style>{`.reveal,.reveal-stagger>*,.hero-copy>*,.hero-media{opacity:1;transform:none;animation:none;transition:none}`}</style>
+        </noscript>
         <HeaderWithCart
           categories={categories}
           site={homepage.site}
           initialCartCount={cartCount}
         />
-        <main className="flex-1 overflow-x-hidden pt-[136px]">{children}</main>
+        <main className="flex-1 overflow-x-clip pt-[136px]">{children}</main>
         <Footer categories={categories} site={homepage.site} />
       </body>
     </html>

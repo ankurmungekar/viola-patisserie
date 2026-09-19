@@ -6,6 +6,7 @@ import { InstagramSection } from "@/components/home/InstagramSection";
 import { OurStorySection } from "@/components/home/OurStorySection";
 import { SignatureCollectionSection } from "@/components/home/SignatureCollectionSection";
 import { ValuePropsSection } from "@/components/home/ValuePropsSection";
+import { Reveal } from "@/components/motion/Reveal";
 import { siteConfig } from "@/lib/config/site";
 import { getHomepageContent } from "@/lib/wordpress/homepage";
 import { getSignatureCategories } from "@/lib/woocommerce/categories";
@@ -34,12 +35,24 @@ export default async function HomePage() {
   return (
     <>
       <HeroBanner content={homepage.hero} />
-      <SignatureCollectionSection categories={categories} />
-      <BestsellersSection products={products} />
-      <OurStorySection content={homepage.ourStory} />
-      <ValuePropsSection valueProps={homepage.valueProps} />
-      <CustomCakesSection content={homepage.customCakes} />
-      <InstagramSection content={homepage.instagram} />
+      <Reveal>
+        <SignatureCollectionSection categories={categories} />
+      </Reveal>
+      <Reveal>
+        <BestsellersSection products={products} />
+      </Reveal>
+      <Reveal>
+        <OurStorySection content={homepage.ourStory} />
+      </Reveal>
+      <Reveal>
+        <ValuePropsSection valueProps={homepage.valueProps} />
+      </Reveal>
+      <Reveal>
+        <CustomCakesSection content={homepage.customCakes} />
+      </Reveal>
+      <Reveal>
+        <InstagramSection content={homepage.instagram} />
+      </Reveal>
     </>
   );
 }
