@@ -50,6 +50,10 @@ export function CartSummary({
             label={`Subtotal (${itemsCount} ${itemLabel})`}
             value={totals.subtotal}
           />
+          <SummaryRow
+            label="Delivery"
+            value={totals.shippingMinor > 0 ? totals.shipping : "Calculated at checkout"}
+          />
           <SummaryRow label={totals.taxLabel} value={totals.tax} />
         </dl>
 
@@ -91,7 +95,7 @@ export function CartSummary({
         )}
 
         <p className="text-lg leading-5 tracking-viola-wide text-viola-text">
-          Shipping calculated at checkout.
+          Delivery is calculated from your pincode.
         </p>
       </div>
     </aside>

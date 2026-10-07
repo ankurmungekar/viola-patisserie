@@ -53,12 +53,23 @@ interface StoreCartTotals {
   currency_minor_unit?: number;
 }
 
+interface StoreShippingRate {
+  rate_id: string;
+  selected?: boolean;
+}
+
+interface StoreShippingPackage {
+  package_id: number | string;
+  shipping_rates?: StoreShippingRate[];
+}
+
 export interface StoreCart {
   items: StoreCartItem[];
   totals?: StoreCartTotals;
   items_count?: number;
   needs_shipping?: boolean;
   has_calculated_shipping?: boolean;
+  shipping_rates?: StoreShippingPackage[];
 }
 
 function parseMinorUnits(
@@ -139,7 +150,7 @@ export function mapStoreCartToCart(cart: StoreCart): Cart {
     items,
     totals: {
       subtotal: formatMinorUnits(cart.totals?.total_items, minorUnit),
-      shipping: formatMinorUnits(cart.totals?.total_shipping, minorUnit),
+      shipping: formatPrice(shippingMinor),
       tax:
         parseMinorUnits(cart.totals?.total_tax, minorUnit) > 0
           ? formatMinorUnits(cart.totals?.total_tax, minorUnit)
@@ -372,6 +383,65 @@ export async function updateCartDeliverySchedule(
   }
 }
 
+async function ensureSelectedShippingRate(
+  session: CartSession,
+  cart: StoreCart,
+): Promise<{ session: CartSession; cart: StoreCart }> {
+  let nextSession = session;
+  let nextCart = cart;
+
+  for (const shippingPackage of nextCart.shipping_rates ?? []) {
+    const rates = shippingPackage.shipping_rates ?? [];
+
+    if (rates.length === 0 || rates.some((rate) => rate.selected)) {
+      continue;
+    }
+
+    const selected = await fetchWithCartSession<StoreCart>(
+      "/cart/select-shipping-rate",
+      nextSession,
+      {
+        method: "POST",
+        body: {
+          package_id: shippingPackage.package_id,
+          rate_id: rates[0].rate_id,
+        },
+      },
+    );
+
+    nextSession = selected.session;
+    nextCart = selected.data;
+  }
+
+  return {
+    session: nextSession,
+    cart: nextCart,
+  };
+}
+
+export async function applyShippingByPostcode(
+  session: CartSession,
+  pincode: string,
+): Promise<{ session: CartSession; cart: StoreCart }> {
+  const result = await fetchWithCartSession<StoreCart>(
+    "/cart/update-customer",
+    session,
+    {
+      method: "POST",
+      body: {
+        shipping_address: {
+          country: "IN",
+          state: "MH",
+          city: "Mumbai",
+          postcode: pincode,
+        },
+      },
+    },
+  );
+
+  return ensureSelectedShippingRate(result.session, result.data);
+}
+
 export async function removeCartItem(
   session: CartSession,
   key: string,
@@ -441,10 +511,7 @@ export async function updateCartCustomer(
     },
   );
 
-  return {
-    session: result.session,
-    cart: result.data,
-  };
+  return ensureSelectedShippingRate(result.session, result.data);
 }
 
 export function applyCartSessionCookies(

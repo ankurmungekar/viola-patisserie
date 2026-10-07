@@ -16,6 +16,15 @@ interface DeliveryTimePickerProps {
 const fieldClassName =
   "h-12 w-full border border-viola-border bg-white px-4 text-sm tracking-viola-wide text-viola-text focus:border-viola-primary focus:outline-none disabled:cursor-not-allowed disabled:bg-viola-topbar/40 disabled:text-viola-text/50";
 
+const DEFAULT_SLOT_ID = "10:00-13:00";
+
+function pickDefaultSlot(dateOption?: DeliveryDateOption): string {
+  const available = dateOption?.slots.filter((slot) => slot.available) ?? [];
+  const preferred = available.find((slot) => slot.id === DEFAULT_SLOT_ID);
+
+  return preferred?.id ?? available[0]?.id ?? "";
+}
+
 export function DeliveryTimePicker({
   pincode,
   pincodeValidated,
@@ -42,8 +51,11 @@ export function DeliveryTimePicker({
         const response = await getDeliverySlots(pincode);
         if (!cancelled) {
           setDates(response.dates);
-          if (response.dates.length > 0 && !selectedDate) {
-            onDateChange(response.dates[0].date);
+          const nextDate = response.dates[0]?.date ?? "";
+
+          if (nextDate) {
+            onDateChange(nextDate);
+            onSlotChange(pickDefaultSlot(response.dates[0]));
           }
         }
       } finally {
@@ -58,7 +70,12 @@ export function DeliveryTimePicker({
     return () => {
       cancelled = true;
     };
-  }, [pincode, pincodeValidated, onDateChange, selectedDate]);
+  }, [pincode, pincodeValidated, onDateChange, onSlotChange]);
+
+  function handleDateChange(date: string) {
+    onDateChange(date);
+    onSlotChange(pickDefaultSlot(dates.find((option) => option.date === date)));
+  }
 
   const selectedDateOption = dates.find((date) => date.date === selectedDate);
   const quickPick = dates[1] ?? dates[0];
@@ -73,7 +90,7 @@ export function DeliveryTimePicker({
       <div className="mt-3 grid gap-3 lg:grid-cols-3">
         <button
           type="button"
-          onClick={() => quickPick && onDateChange(quickPick.date)}
+          onClick={() => quickPick && handleDateChange(quickPick.date)}
           disabled={controlsDisabled || !quickPick}
           className={`${fieldClassName} text-left transition-colors ${
             quickPick && selectedDate === quickPick.date
@@ -86,7 +103,7 @@ export function DeliveryTimePicker({
 
         <select
           value={selectedDate}
-          onChange={(event) => onDateChange(event.target.value)}
+          onChange={(event) => handleDateChange(event.target.value)}
           disabled={controlsDisabled || dates.length === 0}
           className={fieldClassName}
         >

@@ -3,9 +3,20 @@ import type { CartTotals } from "@/types/cart";
 interface OrderSummaryProps {
   totals: CartTotals;
   itemsCount: number;
+  shippingPending?: boolean;
 }
 
-export function OrderSummary({ totals, itemsCount }: OrderSummaryProps) {
+export function OrderSummary({
+  totals,
+  itemsCount,
+  shippingPending = false,
+}: OrderSummaryProps) {
+  const deliveryValue = shippingPending
+    ? "Calculating…"
+    : totals.shippingMinor > 0
+      ? totals.shipping
+      : "—";
+
   return (
     <aside className="border border-viola-border bg-white p-6">
       <h2 className="font-display text-2xl font-semibold text-viola-text">
@@ -18,12 +29,10 @@ export function OrderSummary({ totals, itemsCount }: OrderSummaryProps) {
           </dt>
           <dd>{totals.subtotal}</dd>
         </div>
-        {totals.shippingMinor > 0 ? (
-          <div className="flex items-center justify-between">
-            <dt>Delivery</dt>
-            <dd>{totals.shipping}</dd>
-          </div>
-        ) : null}
+        <div className="flex items-center justify-between">
+          <dt>Delivery</dt>
+          <dd>{deliveryValue}</dd>
+        </div>
         <div className="flex items-center justify-between border-t border-viola-border pt-3 text-lg font-medium">
           <dt>Total</dt>
           <dd>{totals.total}</dd>

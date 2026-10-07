@@ -214,6 +214,23 @@ export async function verifyRazorpayPayment(
   return result;
 }
 
+export async function quoteShipping(pincode: string): Promise<CartResponse> {
+  const response = await fetch("/api/checkout/shipping-quote", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ pincode }),
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error(await parseError(response));
+  }
+
+  return (await response.json()) as CartResponse;
+}
+
 export async function clearCart(): Promise<void> {
   await fetch("/api/cart/clear", {
     method: "POST",

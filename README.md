@@ -51,7 +51,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3001](http://localhost:3001).
 
 If WooCommerce is unavailable, the homepage falls back to typed mock data in development.
 
@@ -103,7 +103,14 @@ Implemented storefront features:
    define('RAZORPAY_KEY_SECRET', 'your_key_secret');
    define('RAZORPAY_WEBHOOK_SECRET', 'your_webhook_secret');
    ```
-3. Configure a shipping method (e.g. Flat rate) in WooCommerce shipping zones
+3. Configure **WooCommerce → Settings → Shipping**:
+   - Set **Shipping location(s)** to “Ship to all locations you sell to” (or specific countries including India)
+   - Add a zone for Mumbai (postcodes `400001…400104`, or paste the same list as Viola Delivery serviceable pincodes)
+   - Add a **Flat rate** method on that zone (for example ₹99)
+   - Optionally add more zones (Thane, Navi Mumbai, rest of Maharashtra) each with its own flat rate
+   - Remove leftover Local pickup / other methods if you only want one charge
+
+   Checkout sends the customer pincode to the Store API (`/cart/update-customer`). WooCommerce then applies the matching zone rate to Order Summary. Keep Viola Delivery pincodes in sync with the zones you actually ship to.
 
 ### Frontend env for Razorpay.js
 

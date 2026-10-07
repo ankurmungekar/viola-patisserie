@@ -1,12 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CartEmpty } from "@/components/cart/CartEmpty";
 import { CartLineItem } from "@/components/cart/CartLineItem";
 import { CartSummary } from "@/components/cart/CartSummary";
 import { checkDeliveryMetaConflict } from "@/lib/utils/cart-delivery";
-import { getCart } from "@/lib/woocommerce/cart";
+import { getCart, quoteShipping } from "@/lib/woocommerce/cart";
 import type { Cart } from "@/types/cart";
 
 interface CartPageClientProps {
@@ -17,12 +17,39 @@ export function CartPageClient({ initialCart }: CartPageClientProps) {
   const router = useRouter();
   const [cart, setCart] = useState(initialCart);
   const conflict = checkDeliveryMetaConflict(cart);
+  const deliveryPincode =
+    cart.items
+      .find((item) => item.extensions.deliveryPincode)
+      ?.extensions.deliveryPincode.replace(/\D/g, "")
+      .slice(0, 6) ?? "";
 
   const refreshCart = useCallback(async () => {
     const response = await getCart();
     setCart(response.cart);
     router.refresh();
   }, [router]);
+
+  useEffect(() => {
+    if (deliveryPincode.length !== 6) {
+      return;
+    }
+
+    let cancelled = false;
+
+    quoteShipping(deliveryPincode)
+      .then((response) => {
+        if (!cancelled) {
+          setCart(response.cart);
+        }
+      })
+      .catch(() => {
+        // Keep cart totals; checkout will retry the quote.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [deliveryPincode]);
 
   if (cart.itemsCount === 0) {
     return <CartEmpty />;

@@ -2,9 +2,9 @@
 
 import Script from "next/script";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
-import { placeOrder, verifyRazorpayPayment, clearCart } from "@/lib/woocommerce/cart";
+import { placeOrder, quoteShipping, verifyRazorpayPayment, clearCart } from "@/lib/woocommerce/cart";
 import { checkDeliveryMetaConflict } from "@/lib/utils/cart-delivery";
 import type { Cart } from "@/types/cart";
 import type { CheckoutFormData } from "@/types/checkout";
@@ -61,10 +61,18 @@ declare global {
   }
 }
 
-export function CheckoutForm({ cart }: CheckoutFormProps) {
+export function CheckoutForm({ cart: initialCart }: CheckoutFormProps) {
   const router = useRouter();
-  const [form, setForm] = useState<CheckoutFormData>(initialFormState);
+  const deliveryPincode =
+    initialCart.items.find((item) => item.extensions.deliveryPincode)?.extensions
+      .deliveryPincode ?? "";
+  const [cart, setCart] = useState(initialCart);
+  const [form, setForm] = useState<CheckoutFormData>({
+    ...initialFormState,
+    postcode: deliveryPincode.replace(/\D/g, "").slice(0, 6),
+  });
   const [submitting, setSubmitting] = useState(false);
+  const [shippingPending, setShippingPending] = useState(false);
   const [error, setError] = useState("");
   const conflict = checkDeliveryMetaConflict(cart);
 
@@ -74,6 +82,42 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
   ) {
     setForm((current) => ({ ...current, [key]: value }));
   }
+
+  useEffect(() => {
+    const pincode = form.postcode.replace(/\D/g, "").slice(0, 6);
+
+    if (pincode.length !== 6) {
+      return;
+    }
+
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      setShippingPending(true);
+      try {
+        const response = await quoteShipping(pincode);
+        if (!cancelled) {
+          setCart(response.cart);
+        }
+      } catch (quoteError) {
+        if (!cancelled) {
+          setError(
+            quoteError instanceof Error
+              ? quoteError.message
+              : "Unable to calculate delivery.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setShippingPending(false);
+        }
+      }
+    }, 400);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [form.postcode]);
 
   const canSubmit =
     form.firstName.trim() &&
@@ -291,7 +335,11 @@ export function CheckoutForm({ cart }: CheckoutFormProps) {
           </button>
         </form>
 
-        <OrderSummary totals={cart.totals} itemsCount={cart.itemsCount} />
+        <OrderSummary
+          totals={cart.totals}
+          itemsCount={cart.itemsCount}
+          shippingPending={shippingPending}
+        />
       </div>
     </>
   );
