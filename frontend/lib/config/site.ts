@@ -7,6 +7,7 @@ export const siteConfig = {
     "Handcrafted cakes & desserts, thoughtfully created to celebrate life's sweetest moments.",
   instagram: "@_violapatisserie_",
   instagramUrl: "https://instagram.com/_violapatisserie_",
+  whatsappUrl: "https://wa.me/917019842601",
   topBarMessage: "Visit Our Store",
   founder: {
     name: "Aishwarya Sinkar",
