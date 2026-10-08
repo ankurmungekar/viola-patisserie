@@ -1,4 +1,5 @@
 import { getWordPressUrl } from "@/lib/woocommerce/client";
+import { normalizeWordPressImageUrl } from "@/lib/wordpress/images";
 import type { Cart, CartItem, CartItemExtensions } from "@/types/cart";
 import { formatPrice } from "@/lib/utils/format-price";
 
@@ -123,9 +124,11 @@ function mapCartItem(item: StoreCartItem): CartItem {
     quantity: item.quantity,
     permalink: item.permalink ?? "",
     image: {
-      src: image?.src ?? image?.thumbnail ?? "",
+      src: normalizeWordPressImageUrl(image?.src ?? image?.thumbnail ?? ""),
       alt: image?.alt ?? item.name,
-      thumbnail: image?.thumbnail,
+      thumbnail: image?.thumbnail
+        ? normalizeWordPressImageUrl(image.thumbnail)
+        : image?.thumbnail,
     },
     lineTotal: formatMinorUnits(item.totals?.line_total, minorUnit),
     lineTotalMinor: parseMinorUnits(item.totals?.line_total, minorUnit),

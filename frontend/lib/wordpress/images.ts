@@ -1,28 +1,36 @@
 import { getWordPressUrl } from "@/lib/woocommerce/client";
 
+function isLocalHostname(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1";
+}
+
 export function normalizeWordPressImageUrl(src: string): string {
-  if (!src || src.startsWith("/")) {
+  if (!src) {
+    return src;
+  }
+
+  const wpOrigin = new URL(getWordPressUrl());
+
+  if (src.startsWith("/")) {
+    if (src.startsWith("/wp-content/")) {
+      return new URL(src, wpOrigin.origin).toString();
+    }
+
     return src;
   }
 
   try {
     const parsed = new URL(src);
-    const wpOrigin = new URL(getWordPressUrl());
+    const isMediaPath = parsed.pathname.includes("/wp-content/");
+    const shouldRewrite =
+      isLocalHostname(parsed.hostname) ||
+      (isMediaPath && parsed.origin !== wpOrigin.origin);
 
-    if (
-      parsed.hostname === "localhost" ||
-      parsed.hostname === "127.0.0.1"
-    ) {
-      parsed.hostname = wpOrigin.hostname;
-
-      if (wpOrigin.port) {
-        parsed.port = wpOrigin.port;
-      } else {
-        parsed.port = "";
-      }
+    if (!shouldRewrite) {
+      return src;
     }
 
-    return parsed.toString();
+    return new URL(`${parsed.pathname}${parsed.search}${parsed.hash}`, wpOrigin.origin).toString();
   } catch {
     return src;
   }

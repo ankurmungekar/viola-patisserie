@@ -20,7 +20,6 @@ export function FilterDrawer({ open, onClose, filterData }: FilterDrawerProps) {
   const searchParams = useSearchParams();
 
   const [flavours, setFlavours] = useState<string[]>([]);
-  const [dietary, setDietary] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([
     filterData.priceRange.min,
     filterData.priceRange.max,
@@ -32,12 +31,10 @@ export function FilterDrawer({ open, onClose, filterData }: FilterDrawerProps) {
     }
 
     const flavourParam = searchParams.get("flavour");
-    const dietaryParam = searchParams.get("dietary");
     const minPrice = Number.parseInt(searchParams.get("minPrice") ?? "", 10);
     const maxPrice = Number.parseInt(searchParams.get("maxPrice") ?? "", 10);
 
     setFlavours(flavourParam ? flavourParam.split(",").filter(Boolean) : []);
-    setDietary(dietaryParam ? dietaryParam.split(",").filter(Boolean) : []);
     setPriceRange([
       Number.isNaN(minPrice) ? filterData.priceRange.min : minPrice,
       Number.isNaN(maxPrice) ? filterData.priceRange.max : maxPrice,
@@ -75,11 +72,7 @@ export function FilterDrawer({ open, onClose, filterData }: FilterDrawerProps) {
       params.delete("flavour");
     }
 
-    if (dietary.length > 0) {
-      params.set("dietary", dietary.join(","));
-    } else {
-      params.delete("dietary");
-    }
+    params.delete("dietary");
 
     if (priceRange[0] > filterData.priceRange.min) {
       params.set("minPrice", String(priceRange[0]));
@@ -136,16 +129,6 @@ export function FilterDrawer({ open, onClose, filterData }: FilterDrawerProps) {
                 options={filterData.flavours}
                 selected={flavours}
                 onChange={setFlavours}
-              />
-            </FilterSection>
-          ) : null}
-
-          {filterData.dietary.length > 0 ? (
-            <FilterSection title="Dietary">
-              <FilterCheckboxGroup
-                options={filterData.dietary}
-                selected={dietary}
-                onChange={setDietary}
               />
             </FilterSection>
           ) : null}

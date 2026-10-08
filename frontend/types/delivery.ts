@@ -18,4 +18,8 @@ export interface DeliveryDateOption {
 
 export interface DeliverySlotsResponse {
   dates: DeliveryDateOption[];
+  minDate?: string;
+  maxDate?: string;
+  blackoutDates?: string[];
+  timeSlots?: DeliverySlot[];
 }

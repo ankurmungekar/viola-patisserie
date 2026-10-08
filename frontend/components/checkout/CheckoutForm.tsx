@@ -1,11 +1,11 @@
 "use client";
 
-import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
-import { placeOrder, quoteShipping, verifyRazorpayPayment, clearCart } from "@/lib/woocommerce/cart";
+import { placeOrder, quoteShipping, verifyRazorpayPayment } from "@/lib/woocommerce/cart";
 import { checkDeliveryMetaConflict } from "@/lib/utils/cart-delivery";
+import { siteConfig } from "@/lib/config/site";
 import type { Cart } from "@/types/cart";
 import type { CheckoutFormData } from "@/types/checkout";
 
@@ -47,18 +47,40 @@ interface RazorpayOptions {
     email: string;
     contact: string;
   };
+  theme: { color: string };
   handler: (response: RazorpayHandlerResponse) => void;
   modal: {
     ondismiss: () => void;
   };
 }
 
+interface RazorpayInstance {
+  open: () => void;
+  on: (
+    event: "payment.failed",
+    handler: (response: { error?: { description?: string } }) => void,
+  ) => void;
+}
+
 declare global {
   interface Window {
-    Razorpay?: new (options: RazorpayOptions) => {
-      open: () => void;
-    };
+    Razorpay?: new (options: RazorpayOptions) => RazorpayInstance;
   }
+}
+
+function loadRazorpayScript(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (window.Razorpay) {
+      resolve();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Failed to load Razorpay"));
+    document.body.appendChild(script);
+  });
 }
 
 export function CheckoutForm({ cart: initialCart }: CheckoutFormProps) {
@@ -141,27 +163,21 @@ export function CheckoutForm({ cart: initialCart }: CheckoutFormProps) {
     setError("");
 
     try {
+      await loadRazorpayScript();
       const orderResult = await placeOrder(form);
 
       if (!orderResult.razorpay) {
-        await clearCart();
-        router.push(
-          `/checkout/success?order_id=${orderResult.orderId}&status=${orderResult.status}`,
-        );
-        return;
+        throw new Error("Unable to initiate payment.");
       }
 
-      if (!window.Razorpay) {
-        throw new Error("Payment gateway failed to load. Please try again.");
-      }
-
-      const razorpay = new window.Razorpay({
+      const razorpay = new window.Razorpay!({
         key: orderResult.razorpay.keyId,
         amount: orderResult.razorpay.amount,
         currency: orderResult.razorpay.currency,
-        name: "Viola Patisserie",
+        name: siteConfig.name,
         description: `Order #${orderResult.orderId}`,
         order_id: orderResult.razorpay.orderId,
+        theme: { color: "#6a1f87" },
         prefill: {
           name: `${form.firstName} ${form.lastName}`.trim(),
           email: form.email,
@@ -192,6 +208,11 @@ export function CheckoutForm({ cart: initialCart }: CheckoutFormProps) {
         },
       });
 
+      razorpay.on("payment.failed", (response) => {
+        setError(response.error?.description ?? "Payment failed. Please try again.");
+        setSubmitting(false);
+      });
+
       razorpay.open();
     } catch (submitError) {
       setError(
@@ -205,7 +226,6 @@ export function CheckoutForm({ cart: initialCart }: CheckoutFormProps) {
 
   return (
     <>
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
@@ -333,6 +353,9 @@ export function CheckoutForm({ cart: initialCart }: CheckoutFormProps) {
           >
             {submitting ? "Processing..." : "Pay with Razorpay"}
           </button>
+          <p className="text-sm tracking-viola-wide text-viola-text/70">
+            Secure payment via Razorpay
+          </p>
         </form>
 
         <OrderSummary

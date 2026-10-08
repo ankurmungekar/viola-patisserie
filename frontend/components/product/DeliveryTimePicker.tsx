@@ -17,12 +17,25 @@ const fieldClassName =
   "h-12 w-full border border-viola-border bg-white px-4 text-sm tracking-viola-wide text-viola-text focus:border-viola-primary focus:outline-none disabled:cursor-not-allowed disabled:bg-viola-topbar/40 disabled:text-viola-text/50";
 
 const DEFAULT_SLOT_ID = "10:00-13:00";
+const CALENDAR_WINDOW_DAYS = 59;
 
 function pickDefaultSlot(dateOption?: DeliveryDateOption): string {
   const available = dateOption?.slots.filter((slot) => slot.available) ?? [];
   const preferred = available.find((slot) => slot.id === DEFAULT_SLOT_ID);
 
   return preferred?.id ?? available[0]?.id ?? "";
+}
+
+function addCalendarDays(dateKey: string, days: number): string {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  const date = new Date(year, (month ?? 1) - 1, day ?? 1);
+  date.setDate(date.getDate() + days);
+
+  const nextYear = date.getFullYear();
+  const nextMonth = String(date.getMonth() + 1).padStart(2, "0");
+  const nextDay = String(date.getDate()).padStart(2, "0");
+
+  return `${nextYear}-${nextMonth}-${nextDay}`;
 }
 
 export function DeliveryTimePicker({
@@ -34,11 +47,23 @@ export function DeliveryTimePicker({
   onSlotChange,
 }: DeliveryTimePickerProps) {
   const [dates, setDates] = useState<DeliveryDateOption[]>([]);
+  const [minDate, setMinDate] = useState("");
+  const [maxDate, setMaxDate] = useState("");
+  const [blackoutDates, setBlackoutDates] = useState<string[]>([]);
+  const [fallbackSlots, setFallbackSlots] = useState<DeliveryDateOption["slots"]>(
+    [],
+  );
+  const [dateError, setDateError] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!pincodeValidated || pincode.length !== 6) {
       setDates([]);
+      setMinDate("");
+      setMaxDate("");
+      setBlackoutDates([]);
+      setFallbackSlots([]);
+      setDateError("");
       return;
     }
 
@@ -51,6 +76,15 @@ export function DeliveryTimePicker({
         const response = await getDeliverySlots(pincode);
         if (!cancelled) {
           setDates(response.dates);
+          setBlackoutDates(response.blackoutDates ?? []);
+          setFallbackSlots(response.timeSlots ?? response.dates[0]?.slots ?? []);
+          const nextMin = response.minDate || response.dates[0]?.date || "";
+          const nextMax =
+            response.maxDate ||
+            (nextMin ? addCalendarDays(nextMin, CALENDAR_WINDOW_DAYS) : "");
+          setMinDate(nextMin);
+          setMaxDate(nextMax);
+
           const nextDate = response.dates[0]?.date ?? "";
 
           if (nextDate) {
@@ -73,11 +107,31 @@ export function DeliveryTimePicker({
   }, [pincode, pincodeValidated, onDateChange, onSlotChange]);
 
   function handleDateChange(date: string) {
+    if (!date) {
+      return;
+    }
+
+    if (blackoutDates.includes(date)) {
+      setDateError("Delivery is not available on this date. Please pick another.");
+      return;
+    }
+
+    const option =
+      dates.find((entry) => entry.date === date) ??
+      (fallbackSlots.length > 0
+        ? { date, label: date, slots: fallbackSlots }
+        : undefined);
+
+    setDateError("");
     onDateChange(date);
-    onSlotChange(pickDefaultSlot(dates.find((option) => option.date === date)));
+    onSlotChange(pickDefaultSlot(option));
   }
 
-  const selectedDateOption = dates.find((date) => date.date === selectedDate);
+  const selectedDateOption =
+    dates.find((date) => date.date === selectedDate) ??
+    (selectedDate && fallbackSlots.length > 0
+      ? { date: selectedDate, label: selectedDate, slots: fallbackSlots }
+      : undefined);
   const quickPick = dates[1] ?? dates[0];
   const controlsDisabled = !pincodeValidated || loading;
 
@@ -101,19 +155,23 @@ export function DeliveryTimePicker({
           {quickPick ? `Tomorrow, ${quickPick.label}` : "Tomorrow"}
         </button>
 
-        <select
+        <input
+          type="date"
           value={selectedDate}
+          min={minDate || undefined}
+          max={maxDate || undefined}
           onChange={(event) => handleDateChange(event.target.value)}
-          disabled={controlsDisabled || dates.length === 0}
+          onClick={(event) => {
+            try {
+              event.currentTarget.showPicker?.();
+            } catch {
+              // The native calendar still opens from the date control.
+            }
+          }}
+          disabled={controlsDisabled || !minDate}
           className={fieldClassName}
-        >
-          <option value="">Select Date</option>
-          {dates.map((date) => (
-            <option key={date.date} value={date.date}>
-              {date.label}
-            </option>
-          ))}
-        </select>
+          aria-label="Select Date"
+        />
 
         <select
           value={selectedSlot}
@@ -132,7 +190,9 @@ export function DeliveryTimePicker({
         </select>
       </div>
 
-      {!pincodeValidated ? (
+      {dateError ? (
+        <p className="mt-2 text-sm tracking-viola-wide text-red-600">{dateError}</p>
+      ) : !pincodeValidated ? (
         <p className="mt-2 text-sm tracking-viola-wide text-viola-text/70">
           Check your pincode above to enable delivery slots.
         </p>

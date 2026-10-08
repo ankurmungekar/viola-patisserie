@@ -1,7 +1,31 @@
 const DEFAULT_WORDPRESS_URL = "http://localhost:8080";
+const PRODUCTION_WORDPRESS_URL = "https://shop.violapatisserie.in";
+
+function isLocalHostname(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1";
+}
 
 export function getWordPressUrl(): string {
-  return process.env.NEXT_PUBLIC_WORDPRESS_URL ?? DEFAULT_WORDPRESS_URL;
+  const configured = (
+    process.env.NEXT_PUBLIC_WORDPRESS_URL ?? DEFAULT_WORDPRESS_URL
+  ).replace(/\/$/, "");
+
+  try {
+    const parsed = new URL(configured);
+
+    if (
+      process.env.NODE_ENV === "production" &&
+      isLocalHostname(parsed.hostname)
+    ) {
+      return PRODUCTION_WORDPRESS_URL;
+    }
+  } catch {
+    if (process.env.NODE_ENV === "production") {
+      return PRODUCTION_WORDPRESS_URL;
+    }
+  }
+
+  return configured;
 }
 
 interface StoreFetchOptions {

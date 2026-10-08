@@ -114,42 +114,57 @@ function formatDateLabel(date: Date): string {
   });
 }
 
-function toDateKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
 function addDays(date: Date, days: number): Date {
   const next = new Date(date);
   next.setDate(next.getDate() + days);
   return next;
 }
 
+function toLocalDateKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function getMockDeliverySlots(fromDate = new Date()): DeliverySlotsResponse {
   const now = new Date();
-  const afterCutoff = now.getHours() >= deliveryDefaults.cutoffHour;
+  now.setHours(0, 0, 0, 0);
+  const afterCutoff = new Date().getHours() >= deliveryDefaults.cutoffHour;
   const startOffset = deliveryDefaults.leadTimeDays + (afterCutoff ? 1 : 0);
+  const firstAvailable = addDays(now, startOffset);
+  const maxDate = addDays(firstAvailable, 59);
+  const requested = new Date(fromDate);
+  requested.setHours(0, 0, 0, 0);
+  let cursor = requested > firstAvailable ? requested : firstAvailable;
+  const timeSlots = deliveryDefaults.timeSlots.map((slot) => ({
+    id: slot.id,
+    label: slot.label,
+    available: true,
+  }));
   const dates: DeliverySlotsResponse["dates"] = [];
 
-  for (let index = 0; index < 7; index += 1) {
-    const date = addDays(fromDate, startOffset + index);
-    const dateKey = toDateKey(date);
+  while (dates.length < 7 && cursor <= maxDate) {
+    const dateKey = toLocalDateKey(cursor);
 
-    if (deliveryDefaults.blackoutDates.includes(dateKey)) {
-      continue;
+    if (!deliveryDefaults.blackoutDates.includes(dateKey)) {
+      dates.push({
+        date: dateKey,
+        label: formatDateLabel(cursor),
+        slots: timeSlots,
+      });
     }
 
-    dates.push({
-      date: dateKey,
-      label: formatDateLabel(date),
-      slots: deliveryDefaults.timeSlots.map((slot) => ({
-        id: slot.id,
-        label: slot.label,
-        available: true,
-      })),
-    });
+    cursor = addDays(cursor, 1);
   }
 
-  return { dates };
+  return {
+    dates,
+    minDate: toLocalDateKey(firstAvailable),
+    maxDate: toLocalDateKey(maxDate),
+    blackoutDates: deliveryDefaults.blackoutDates,
+    timeSlots,
+  };
 }
 
 export function validateMockPincode(pincode: string): PincodeValidationResult {

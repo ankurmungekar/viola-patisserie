@@ -103,6 +103,11 @@ Implemented storefront features:
    define('RAZORPAY_KEY_SECRET', 'your_key_secret');
    define('RAZORPAY_WEBHOOK_SECRET', 'your_webhook_secret');
    ```
+   Optional webhook URL (event `payment.captured`):
+   ```
+   https://shop.violapatisserie.in/wp-json/viola/v1/webhooks/razorpay
+   ```
+   Checkout creates a WooCommerce order, opens Razorpay Checkout.js, then verifies the signature before marking the order paid.
 3. Configure **WooCommerce → Settings → Shipping**:
    - Set **Shipping location(s)** to “Ship to all locations you sell to” (or specific countries including India)
    - Add a zone for Mumbai (postcodes `400001…400104`, or paste the same list as Viola Delivery serviceable pincodes)

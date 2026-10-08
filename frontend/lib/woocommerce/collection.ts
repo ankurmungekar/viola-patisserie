@@ -12,7 +12,6 @@ export interface CollectionQuery {
   categorySlug?: string | null;
   sort?: CollectionSortValue;
   flavours?: string[];
-  dietary?: string[];
   minPrice?: number;
   maxPrice?: number;
   page?: number;
@@ -27,7 +26,6 @@ export interface FilterTermOption {
 
 export interface CollectionFilterData {
   flavours: FilterTermOption[];
-  dietary: FilterTermOption[];
   priceRange: {
     min: number;
     max: number;
@@ -131,19 +129,12 @@ function buildCollectionSearchParams(
     attributeIndex += 1;
   }
 
-  for (const slug of query.dietary ?? []) {
-    params[`attributes[${attributeIndex}][attribute]`] =
-      COLLECTION_FILTER_ATTRIBUTES.dietary;
-    params[`attributes[${attributeIndex}][slug]`] = slug;
-    attributeIndex += 1;
-  }
-
   return params;
 }
 
 function buildCollectionDataQuery(
   categoryId?: number | null,
-  activeFilters?: Pick<CollectionQuery, "flavours" | "dietary" | "minPrice" | "maxPrice">,
+  activeFilters?: Pick<CollectionQuery, "flavours" | "minPrice" | "maxPrice">,
 ): string {
   const url = new URL("/wp-json/wc/store/v1/products/collection-data", "http://localhost");
 
@@ -153,11 +144,6 @@ function buildCollectionDataQuery(
     COLLECTION_FILTER_ATTRIBUTES.flavour,
   );
   url.searchParams.set("calculate_attribute_counts[0][query_type]", "or");
-  url.searchParams.set(
-    "calculate_attribute_counts[1][taxonomy]",
-    COLLECTION_FILTER_ATTRIBUTES.dietary,
-  );
-  url.searchParams.set("calculate_attribute_counts[1][query_type]", "or");
 
   if (categoryId) {
     url.searchParams.set("category", String(categoryId));
@@ -177,15 +163,6 @@ function buildCollectionDataQuery(
     url.searchParams.set(
       `attributes[${attributeIndex}][attribute]`,
       COLLECTION_FILTER_ATTRIBUTES.flavour,
-    );
-    url.searchParams.set(`attributes[${attributeIndex}][slug]`, slug);
-    attributeIndex += 1;
-  }
-
-  for (const slug of activeFilters?.dietary ?? []) {
-    url.searchParams.set(
-      `attributes[${attributeIndex}][attribute]`,
-      COLLECTION_FILTER_ATTRIBUTES.dietary,
     );
     url.searchParams.set(`attributes[${attributeIndex}][slug]`, slug);
     attributeIndex += 1;
@@ -313,7 +290,7 @@ export async function getProductsForCollection(
 
 export async function getCollectionFilterData(
   categorySlug?: string | null,
-  activeFilters?: Pick<CollectionQuery, "flavours" | "dietary" | "minPrice" | "maxPrice">,
+  activeFilters?: Pick<CollectionQuery, "flavours" | "minPrice" | "maxPrice">,
 ): Promise<CollectionFilterData> {
   const categoryId = categorySlug
     ? await getCategoryIdBySlug(categorySlug)
@@ -321,9 +298,8 @@ export async function getCollectionFilterData(
 
   const queryString = buildCollectionDataQuery(categoryId, activeFilters);
 
-  const [flavourTerms, dietaryTerms, data] = await Promise.all([
+  const [flavourTerms, data] = await Promise.all([
     getAttributeTerms(COLLECTION_FILTER_ATTRIBUTES.flavour),
-    getAttributeTerms(COLLECTION_FILTER_ATTRIBUTES.dietary),
     safeStoreFetch<StoreCollectionData>({
       path: `/products/collection-data${queryString}`,
     }),
@@ -335,7 +311,6 @@ export async function getCollectionFilterData(
 
   return {
     flavours: mapTermsWithCounts(flavourTerms, counts),
-    dietary: mapTermsWithCounts(dietaryTerms, counts),
     priceRange: {
       min: min > 0 ? min : 500,
       max: max > 0 ? max : 2500,
@@ -353,7 +328,6 @@ export function parseCollectionSearchParams(
 
   const sort = getValue("sort") as CollectionSortValue | undefined;
   const flavourParam = getValue("flavour");
-  const dietaryParam = getValue("dietary");
   const minPrice = Number.parseInt(getValue("minPrice") ?? "", 10);
   const maxPrice = Number.parseInt(getValue("maxPrice") ?? "", 10);
 
@@ -361,9 +335,6 @@ export function parseCollectionSearchParams(
     sort: sort ?? DEFAULT_COLLECTION_SORT,
     flavours: flavourParam
       ? flavourParam.split(",").filter(Boolean)
-      : undefined,
-    dietary: dietaryParam
-      ? dietaryParam.split(",").filter(Boolean)
       : undefined,
     minPrice: Number.isNaN(minPrice) ? undefined : minPrice,
     maxPrice: Number.isNaN(maxPrice) ? undefined : maxPrice,

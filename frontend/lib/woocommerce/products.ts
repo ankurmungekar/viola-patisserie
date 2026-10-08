@@ -9,6 +9,7 @@ import {
 } from "@/lib/woocommerce/mocks";
 import { formatPrice } from "@/lib/utils/format-price";
 import { stripHtml } from "@/lib/utils/strip-html";
+import { normalizeWordPressImageUrl } from "@/lib/wordpress/images";
 import type {
   Product,
   ProductAttribute,
@@ -97,7 +98,9 @@ function mapImages(images: StoreProductImage[]): ProductImage[] {
   }
 
   return images.map((image, index) => ({
-    src: image.src ?? image.thumbnail ?? DEFAULT_PRODUCT_IMAGE,
+    src: normalizeWordPressImageUrl(
+      image.src ?? image.thumbnail ?? DEFAULT_PRODUCT_IMAGE,
+    ),
     alt: image.alt ?? `Product image ${index + 1}`,
   }));
 }

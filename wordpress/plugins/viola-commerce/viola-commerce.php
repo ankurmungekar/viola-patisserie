@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Viola Commerce
  * Description: Viola Patisserie custom delivery and order functionality.
- * Version: 0.5.0
+ * Version: 0.5.1
  * Author: Viola Patisserie
  * Text Domain: viola-commerce
  */
@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('VIOLA_COMMERCE_VERSION', '0.5.0');
+define('VIOLA_COMMERCE_VERSION', '0.5.1');
 define('VIOLA_COMMERCE_PLUGIN_FILE', __FILE__);
 define('VIOLA_COMMERCE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 

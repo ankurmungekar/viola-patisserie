@@ -9,7 +9,6 @@ import type { Category } from "@/types/category";
 const FILTER_QUERY_KEYS = [
   "sort",
   "flavour",
-  "dietary",
   "minPrice",
   "maxPrice",
 ] as const;

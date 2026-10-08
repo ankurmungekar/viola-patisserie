@@ -1,4 +1,5 @@
 import { DEFAULT_CATEGORY_IMAGE } from "@/lib/config/categories";
+import { normalizeWordPressImageUrl } from "@/lib/wordpress/images";
 import { signatureCategorySlugs } from "@/lib/config/site";
 import { safeStoreFetch } from "@/lib/woocommerce/client";
 import { mockCategories } from "@/lib/woocommerce/mocks";
@@ -20,10 +21,11 @@ interface StoreCategory {
 }
 
 function mapCategory(category: StoreCategory): Category {
-  const imageSrc =
+  const imageSrc = normalizeWordPressImageUrl(
     category.image?.thumbnail ??
-    category.image?.src ??
-    DEFAULT_CATEGORY_IMAGE;
+      category.image?.src ??
+      DEFAULT_CATEGORY_IMAGE,
+  );
 
   return {
     id: category.id,

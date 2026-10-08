@@ -65,7 +65,21 @@ export async function getDeliverySlots(
       throw new Error(`Delivery slots failed: ${response.status}`);
     }
 
-    return (await response.json()) as DeliverySlotsResponse;
+    const payload = (await response.json()) as {
+      dates?: DeliverySlotsResponse["dates"];
+      min_date?: string;
+      max_date?: string;
+      blackout_dates?: string[];
+      time_slots?: DeliverySlotsResponse["timeSlots"];
+    };
+
+    return {
+      dates: payload.dates ?? [],
+      minDate: payload.min_date ?? "",
+      maxDate: payload.max_date ?? "",
+      blackoutDates: payload.blackout_dates ?? [],
+      timeSlots: payload.time_slots ?? [],
+    };
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
       console.warn("[delivery] Falling back to mock delivery slots:", error);

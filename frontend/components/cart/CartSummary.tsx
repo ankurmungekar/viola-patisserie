@@ -54,7 +54,9 @@ export function CartSummary({
             label="Delivery"
             value={totals.shippingMinor > 0 ? totals.shipping : "Calculated at checkout"}
           />
-          <SummaryRow label={totals.taxLabel} value={totals.tax} />
+          {totals.taxMinor > 0 ? (
+            <SummaryRow label={totals.taxLabel} value={totals.tax} />
+          ) : null}
         </dl>
 
         <div className="border-t border-viola-border pt-4">

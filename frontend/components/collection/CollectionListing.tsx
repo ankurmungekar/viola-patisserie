@@ -27,7 +27,6 @@ export function CollectionListing({
     let count = 0;
 
     if (searchParams.get("flavour")) count += 1;
-    if (searchParams.get("dietary")) count += 1;
     if (searchParams.get("minPrice") || searchParams.get("maxPrice")) count += 1;
 
     return count;

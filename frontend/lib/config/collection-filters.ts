@@ -1,6 +1,5 @@
 export const COLLECTION_FILTER_ATTRIBUTES = {
   flavour: "pa_flavour",
-  dietary: "pa_dietary",
 } as const;
 
 export const COLLECTION_SORT_OPTIONS = [

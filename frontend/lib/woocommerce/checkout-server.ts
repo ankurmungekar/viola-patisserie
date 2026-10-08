@@ -179,36 +179,40 @@ export async function placeOrder(
     throw new Error("Unable to create order. Please try again.");
   }
 
-  let razorpay: PlaceOrderResult["razorpay"] = null;
-
-  try {
-    const razorpayResponse = await fetch(
-      new URL(
-        "/wp-json/viola/v1/checkout/razorpay/create",
-        getWordPressUrl(),
-      ).toString(),
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ order_id: order.id }),
-        cache: "no-store",
+  const razorpayResponse = await fetch(
+    new URL(
+      "/wp-json/viola/v1/checkout/razorpay/create",
+      getWordPressUrl(),
+    ).toString(),
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({ order_id: order.id }),
+      cache: "no-store",
+    },
+  );
 
-    if (razorpayResponse.ok) {
-      const data = (await razorpayResponse.json()) as RazorpayCreateResponse;
-      razorpay = {
-        keyId: data.keyId,
-        orderId: data.razorpayOrderId,
-        amount: data.amount,
-        currency: data.currency,
-      };
-    }
-  } catch {
-    razorpay = null;
+  if (!razorpayResponse.ok) {
+    const error = (await razorpayResponse.json().catch(() => null)) as {
+      message?: string;
+    } | null;
+    throw new Error(error?.message ?? "Unable to initiate payment.");
+  }
+
+  const data = (await razorpayResponse.json()) as RazorpayCreateResponse;
+  const razorpay = {
+    keyId:
+      data.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "",
+    orderId: data.razorpayOrderId,
+    amount: data.amount,
+    currency: data.currency,
+  };
+
+  if (!razorpay.keyId || !razorpay.orderId) {
+    throw new Error("Unable to initiate payment.");
   }
 
   return {
