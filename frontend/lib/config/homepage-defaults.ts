@@ -63,7 +63,7 @@ export const homepageDefaults: HomepageContent = {
     description:
       "Every celebration is unique and your cake should be too. Share your ideas, theme, flavours, and inspiration, and we'll create a handcrafted cake designed exclusively for your special occasion",
     ctaLabel: "Contact Us for a Custom Order",
-    ctaUrl: "/contact",
+    ctaUrl: "/custom-cakes",
     image: {
       src: "/images/made-for-celebration.jpg",
       alt: "Custom celebration cake with floral decorations",

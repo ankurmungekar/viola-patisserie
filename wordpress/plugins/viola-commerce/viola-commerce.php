@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Viola Commerce
  * Description: Viola Patisserie custom delivery and order functionality.
- * Version: 0.6.0
+ * Version: 0.7.0
  * Author: Viola Patisserie
  * Text Domain: viola-commerce
  */
@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('VIOLA_COMMERCE_VERSION', '0.6.0');
+define('VIOLA_COMMERCE_VERSION', '0.7.0');
 define('VIOLA_COMMERCE_PLUGIN_FILE', __FILE__);
 define('VIOLA_COMMERCE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -24,6 +24,9 @@ require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-collection-banner-setti
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/about-defaults.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-about-rest-api.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-about-settings.php';
+require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/custom-cakes-defaults.php';
+require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-custom-cakes-rest-api.php';
+require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-custom-cakes-settings.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/delivery-defaults.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-delivery-rest-api.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-delivery-settings.php';
@@ -44,6 +47,9 @@ function viola_commerce_init(): void
 
     $about_api = new Viola_Commerce_About_Rest_Api();
     $about_api->register();
+
+    $custom_cakes_api = new Viola_Commerce_Custom_Cakes_Rest_Api();
+    $custom_cakes_api->register();
 
     $delivery_api = new Viola_Commerce_Delivery_Rest_Api();
     $delivery_api->register();
@@ -71,6 +77,9 @@ function viola_commerce_init(): void
 
         $about_settings = new Viola_Commerce_About_Settings();
         $about_settings->register();
+
+        $custom_cakes_settings = new Viola_Commerce_Custom_Cakes_Settings();
+        $custom_cakes_settings->register();
 
         $delivery_settings = new Viola_Commerce_Delivery_Settings();
         $delivery_settings->register();

@@ -197,6 +197,38 @@ export function TruckIcon() {
   );
 }
 
+export function HeartIcon() {
+  return (
+    <svg width="46" height="46" viewBox="0 0 46 46" fill="none" aria-hidden="true">
+      <path
+        d="M23 36s-11-7.2-11-15.2C12 16 15.2 13 19 13c2.2 0 3.6 1.1 4 2.2.4-1.1 1.8-2.2 4-2.2 3.8 0 7 3 7 7.8C34 28.8 23 36 23 36Z"
+        stroke="#8D0CA2"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function ChatIcon() {
+  return (
+    <svg width="46" height="46" viewBox="0 0 46 46" fill="none" aria-hidden="true">
+      <path
+        d="M12 14h22a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H20l-6 5v-5h-2a3 3 0 0 1-3-3V17a3 3 0 0 1 3-3Z"
+        stroke="#8D0CA2"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M17 23h12M17 19h8"
+        stroke="#8D0CA2"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export function GiftBoxIcon() {
   return (
     <svg width="46" height="46" viewBox="0 0 46 46" fill="none" aria-hidden="true">

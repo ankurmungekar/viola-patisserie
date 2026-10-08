@@ -135,6 +135,16 @@ input[type="date"] {
   font-size: 1.25rem;
 }
 
+.custom-cakes-lightbox .swiper-button-next,
+.custom-cakes-lightbox .swiper-button-prev {
+  color: #ffffff;
+}
+
+.custom-cakes-lightbox .swiper-button-next::after,
+.custom-cakes-lightbox .swiper-button-prev::after {
+  font-size: 1.5rem;
+}
+
 .viola-category-carousel {
   overflow: hidden;
 }
