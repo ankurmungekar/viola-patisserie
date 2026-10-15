@@ -243,7 +243,7 @@ interface CakeIconProps {
   className?: string;
 }
 
-export function CakeIcon({ className }: CakeIconProps) {
+export function CakeIcon({ className }: CakeIconProps = {}) {
   return (
     <svg
       viewBox="0 0 60 60"
