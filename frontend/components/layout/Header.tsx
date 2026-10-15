@@ -8,9 +8,7 @@ import {
   ChevronDownIcon,
   CloseIcon,
   MenuIcon,
-  SearchIcon,
   StoreIcon,
-  UserIcon,
 } from "@/components/icons";
 import { mainNavLinks } from "@/lib/config/site";
 import type { Category } from "@/types/category";
@@ -116,20 +114,6 @@ export function Header({ categories, site, cartCount = 0 }: HeaderProps) {
           </nav>
 
           <div className="flex items-center gap-4 md:gap-6">
-            <Link
-              href="/search"
-              aria-label="Search"
-              className="hidden text-viola-text hover:text-viola-primary sm:inline-flex"
-            >
-              <SearchIcon />
-            </Link>
-            <Link
-              href="/account"
-              aria-label="Account"
-              className="hidden text-viola-text hover:text-viola-primary sm:inline-flex"
-            >
-              <UserIcon />
-            </Link>
             <Link
               href="/cart"
               aria-label={`Cart with ${cartCount} items`}

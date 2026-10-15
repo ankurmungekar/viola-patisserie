@@ -10,6 +10,9 @@ class Viola_Commerce_Contact_Rest_Api
     {
         $this->register_enquiry_post_type();
         add_action('rest_api_init', [$this, 'register_routes']);
+        add_action('add_meta_boxes_viola_enquiry', [$this, 'register_meta_box']);
+        add_filter('manage_viola_enquiry_posts_columns', [$this, 'enquiry_columns']);
+        add_action('manage_viola_enquiry_posts_custom_column', [$this, 'render_enquiry_column'], 10, 2);
     }
 
     public function register_enquiry_post_type(): void
@@ -33,6 +36,75 @@ class Viola_Commerce_Contact_Rest_Api
                 'capability_type' => 'post',
             ]
         );
+    }
+
+    public function register_meta_box(): void
+    {
+        add_meta_box(
+            'viola_enquiry_contact',
+            'Contact details',
+            [$this, 'render_meta_box'],
+            'viola_enquiry',
+            'side',
+            'high'
+        );
+    }
+
+    public function render_meta_box(WP_Post $post): void
+    {
+        $email = (string) get_post_meta($post->ID, '_viola_contact_email', true);
+        $phone = (string) get_post_meta($post->ID, '_viola_contact_phone', true);
+
+        echo '<p><strong>Email</strong><br />';
+        if ($email !== '' && is_email($email)) {
+            echo '<a href="mailto:' . esc_attr($email) . '">' . esc_html($email) . '</a>';
+        } else {
+            echo esc_html($email !== '' ? $email : 'Not provided');
+        }
+        echo '</p>';
+
+        echo '<p><strong>Phone</strong><br />';
+        echo esc_html($phone !== '' ? $phone : 'Not provided');
+        echo '</p>';
+    }
+
+    /**
+     * @param array<string, string> $columns
+     * @return array<string, string>
+     */
+    public function enquiry_columns(array $columns): array
+    {
+        $updated = [];
+
+        foreach ($columns as $key => $label) {
+            $updated[$key] = $label;
+
+            if ($key === 'title') {
+                $updated['viola_contact_email'] = 'Email';
+                $updated['viola_contact_phone'] = 'Phone';
+            }
+        }
+
+        return $updated;
+    }
+
+    public function render_enquiry_column(string $column, int $post_id): void
+    {
+        if ($column === 'viola_contact_email') {
+            $email = (string) get_post_meta($post_id, '_viola_contact_email', true);
+            if ($email !== '' && is_email($email)) {
+                echo '<a href="mailto:' . esc_attr($email) . '">' . esc_html($email) . '</a>';
+                return;
+            }
+
+            echo esc_html($email !== '' ? $email : '—');
+            return;
+        }
+
+        if ($column === 'viola_contact_phone') {
+            $phone = (string) get_post_meta($post_id, '_viola_contact_phone', true);
+            echo esc_html($phone !== '' ? $phone : '—');
+        }
     }
 
     public function register_routes(): void
