@@ -58,32 +58,33 @@ export function Header({ categories, site, cartCount = 0 }: HeaderProps) {
             className="hidden items-center gap-8 lg:flex"
             aria-label="Main navigation"
           >
-            <div className="relative">
-              <div className="flex items-center gap-1">
-                <Link
-                  href="/collections"
-                  className="text-sm uppercase tracking-viola text-viola-text hover:text-viola-primary"
-                >
-                  Signature Collections
-                </Link>
-                <button
-                  type="button"
-                  className="text-viola-text hover:text-viola-primary"
-                  aria-expanded={collectionsOpen}
-                  aria-haspopup="true"
-                  aria-label="Browse collection categories"
-                  onClick={() => setCollectionsOpen((open) => !open)}
-                  onBlur={() => setCollectionsOpen(false)}
-                >
-                  <ChevronDownIcon />
-                </button>
-              </div>
-              {collectionsOpen ? (
-                <ul className="absolute left-0 top-full z-10 mt-2 min-w-48 border border-viola-border bg-white py-2 shadow-sm">
+            <div
+              className="relative"
+              onMouseEnter={() => setCollectionsOpen(true)}
+              onMouseLeave={() => setCollectionsOpen(false)}
+            >
+              <Link
+                href="/collections"
+                className="flex items-center gap-1 text-sm uppercase tracking-viola text-viola-text hover:text-viola-primary"
+                aria-haspopup="true"
+                aria-expanded={collectionsOpen}
+              >
+                Signature Collections
+                <ChevronDownIcon />
+              </Link>
+              <div
+                className={`absolute left-0 top-full z-10 pt-2 ${
+                  collectionsOpen
+                    ? "visible opacity-100"
+                    : "invisible pointer-events-none opacity-0"
+                }`}
+              >
+                <ul className="min-w-48 border border-viola-border bg-white py-2 shadow-sm">
                   <li>
                     <Link
                       href="/collections"
                       className="block px-4 py-2 text-sm tracking-viola-wide text-viola-text hover:bg-viola-topbar"
+                      onClick={() => setCollectionsOpen(false)}
                     >
                       All Collections
                     </Link>
@@ -93,13 +94,14 @@ export function Header({ categories, site, cartCount = 0 }: HeaderProps) {
                       <Link
                         href={`/collections/${category.slug}`}
                         className="block px-4 py-2 text-sm tracking-viola-wide text-viola-text hover:bg-viola-topbar"
+                        onClick={() => setCollectionsOpen(false)}
                       >
                         {category.name}
                       </Link>
                     </li>
                   ))}
                 </ul>
-              ) : null}
+              </div>
             </div>
 
             {mainNavLinks.map((link) => (
