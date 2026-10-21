@@ -135,7 +135,7 @@ export const mockCategories: Category[] = [
     name: "Cakes",
     slug: "cakes",
     description: "Classic and celebration cakes",
-    image: { src: "/images/cake-category.png", alt: "Cakes" },
+    image: { src: "/images/cake-category.jpg", alt: "Cakes" },
     count: 12,
   },
   {
@@ -143,7 +143,7 @@ export const mockCategories: Category[] = [
     name: "Brownies",
     slug: "brownies",
     description: "Rich chocolate brownies",
-    image: { src: "/images/cake-category.png", alt: "Brownies" },
+    image: { src: "/images/brownies-category.jpg", alt: "Brownies" },
     count: 6,
   },
   {
@@ -167,7 +167,7 @@ export const mockCategories: Category[] = [
     name: "Cupcakes",
     slug: "cupcakes",
     description: "Handcrafted cupcakes",
-    image: { src: DEFAULT_CATEGORY_IMAGE, alt: "Cupcakes" },
+    image: { src: "/images/cupcakes-category.jpg", alt: "Cupcakes" },
     count: 10,
   },
   {
@@ -177,22 +177,6 @@ export const mockCategories: Category[] = [
     description: "Personal-sized bento cakes",
     image: { src: "/images/bento-cake-category.jpg", alt: "Bento Cakes" },
     count: 7,
-  },
-  {
-    id: 7,
-    name: "Floral Cupcakes",
-    slug: "floral-cupcakes",
-    description: "Handcrafted floral cupcakes",
-    image: { src: DEFAULT_CATEGORY_IMAGE, alt: "Floral Cupcakes" },
-    count: 4,
-  },
-  {
-    id: 8,
-    name: "Cheesecakes",
-    slug: "cheesecakes",
-    description: "Creamy artisan cheesecakes",
-    image: { src: DEFAULT_CATEGORY_IMAGE, alt: "Cheesecakes" },
-    count: 6,
   },
 ];
 
