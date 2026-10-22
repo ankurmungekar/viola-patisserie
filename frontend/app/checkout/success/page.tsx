@@ -42,10 +42,22 @@ export default async function CheckoutSuccessPage({
             ? `Your order #${orderId} has been received.`
             : "Your order has been received."}
           {status ? ` Status: ${status}.` : ""} We will prepare your order for
-          the scheduled delivery window.
+          the scheduled delivery window. A confirmation email with your
+          tracking link is on its way.
         </p>
         <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <Button href="/collections">Continue Shopping</Button>
+          <Button
+            href={
+              orderId
+                ? `/track-order?order=${encodeURIComponent(orderId)}`
+                : "/track-order"
+            }
+          >
+            Track Your Order
+          </Button>
+          <Button href="/collections" variant="outline">
+            Continue Shopping
+          </Button>
           <Link
             href="/"
             className="text-sm tracking-viola-wide text-viola-primary hover:underline"

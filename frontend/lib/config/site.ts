@@ -29,6 +29,7 @@ export const footerExploreLinks = [
 ] as const;
 
 export const footerHelpLinks = [
+  { label: "Track Order", href: "/track-order" },
   { label: "Shipping & Cancellation", href: "/shipping" },
   { label: "Returns & Refunds", href: "/returns" },
   { label: "FAQs", href: "/faqs" },

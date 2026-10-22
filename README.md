@@ -117,6 +117,21 @@ Implemented storefront features:
 
    Checkout sends the customer pincode to the Store API (`/cart/update-customer`). WooCommerce then applies the matching zone rate to Order Summary. Keep Viola Delivery pincodes in sync with the zones you actually ship to.
 
+### Order confirmation email and tracking
+
+When a payment is confirmed (via checkout verify or the Razorpay webhook), the plugin sends a branded confirmation email with a **Track your order** link to `/track-order?order=<id>`. The default WooCommerce "Processing order" customer email is disabled to avoid duplicates.
+
+Add to `wp-config.php`:
+
+```php
+define('VIOLA_SITE_URL', 'https://violapatisserie.in'); // storefront URL used in the tracking link
+define('VIOLA_ORDER_EMAIL_FROM', 'orders@your-domain'); // optional; falls back to VIOLA_CONTACT_EMAIL, then admin email
+```
+
+Install an SMTP plugin (e.g. WP Mail SMTP with Hostinger email) so `wp_mail` is delivered reliably; the From address should belong to that mailbox's domain.
+
+Tracking statuses: unpaid → *Waiting for payment*, Processing → *Baking*, a tracking number/URL in order meta or an order note containing a courier link / "out for delivery" → *Out for delivery*, Completed → *Delivered*.
+
 ### Frontend env for Razorpay.js
 
 Set `NEXT_PUBLIC_RAZORPAY_KEY_ID` in `frontend/.env.local` (public key only).

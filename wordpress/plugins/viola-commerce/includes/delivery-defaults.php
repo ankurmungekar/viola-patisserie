@@ -122,3 +122,54 @@ function viola_commerce_get_delivery_slots(string $pincode, string $from = ''): 
         'time_slots' => $time_slots,
     ];
 }
+
+function viola_commerce_get_delivery_slot_label(string $slot_id): string
+{
+    if ($slot_id === '') {
+        return '';
+    }
+
+    foreach (viola_commerce_get_delivery_settings()['time_slots'] as $slot) {
+        if ((string) ($slot['id'] ?? '') === $slot_id) {
+            return (string) ($slot['label'] ?? $slot_id);
+        }
+    }
+
+    return $slot_id;
+}
+
+/**
+ * @return array{date: string, slot: string}|null
+ */
+function viola_commerce_get_order_delivery_details(WC_Order $order): ?array
+{
+    $date_value = (string) $order->get_meta('_viola_delivery_date');
+    $slot_value = (string) $order->get_meta('_viola_delivery_slot');
+
+    if ($date_value === '' || $slot_value === '') {
+        foreach ($order->get_items() as $item) {
+            if (!$item instanceof WC_Order_Item_Product) {
+                continue;
+            }
+
+            $date_value = $date_value !== '' ? $date_value : (string) $item->get_meta('Delivery Date');
+            $slot_value = $slot_value !== '' ? $slot_value : (string) $item->get_meta('Delivery Slot');
+        }
+    }
+
+    if ($date_value === '' && $slot_value === '') {
+        return null;
+    }
+
+    $date_label = $date_value;
+    $date = date_create_immutable($date_value, wp_timezone());
+
+    if ($date instanceof DateTimeImmutable) {
+        $date_label = $date->format('D, j M Y');
+    }
+
+    return [
+        'date' => $date_label,
+        'slot' => viola_commerce_get_delivery_slot_label($slot_value),
+    ];
+}

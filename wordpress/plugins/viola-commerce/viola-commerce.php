@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Viola Commerce
  * Description: Viola Patisserie custom delivery and order functionality.
- * Version: 0.7.1
+ * Version: 0.8.0
  * Author: Viola Patisserie
  * Text Domain: viola-commerce
  */
@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('VIOLA_COMMERCE_VERSION', '0.7.1');
+define('VIOLA_COMMERCE_VERSION', '0.8.0');
 define('VIOLA_COMMERCE_PLUGIN_FILE', __FILE__);
 define('VIOLA_COMMERCE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 
@@ -36,6 +36,8 @@ require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-razorpay-gateway.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-checkout-rest-api.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-razorpay-webhook.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-contact-rest-api.php';
+require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-order-email.php';
+require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-order-tracking.php';
 
 function viola_commerce_init(): void
 {
@@ -67,6 +69,12 @@ function viola_commerce_init(): void
 
     $contact_api = new Viola_Commerce_Contact_Rest_Api();
     $contact_api->register();
+
+    $order_email = new Viola_Commerce_Order_Email();
+    $order_email->register();
+
+    $order_tracking = new Viola_Commerce_Order_Tracking();
+    $order_tracking->register();
 
     if (is_admin()) {
         $homepage_settings = new Viola_Commerce_Homepage_Settings();
