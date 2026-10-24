@@ -45,26 +45,31 @@ export default async function CheckoutSuccessPage({
           the scheduled delivery window. A confirmation email with your
           tracking link is on its way.
         </p>
-        <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+        <div className="mt-8 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-center">
           <Button
             href={
               orderId
                 ? `/track-order?order=${encodeURIComponent(orderId)}`
                 : "/track-order"
             }
+            className="whitespace-nowrap px-6"
           >
             Track Your Order
           </Button>
-          <Button href="/collections" variant="outline">
+          <Button
+            href="/collections"
+            variant="outline"
+            className="whitespace-nowrap px-6"
+          >
             Continue Shopping
           </Button>
-          <Link
-            href="/"
-            className="text-sm tracking-viola-wide text-viola-primary hover:underline"
-          >
-            Back to home
-          </Link>
         </div>
+        <Link
+          href="/"
+          className="mt-6 inline-block text-sm tracking-viola-wide text-viola-primary hover:underline"
+        >
+          Back to home
+        </Link>
       </div>
     </section>
   );
