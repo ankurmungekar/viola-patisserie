@@ -5,6 +5,7 @@ import { CakeMessageInput } from "@/components/product/CakeMessageInput";
 import { DeliveryLocation } from "@/components/product/DeliveryLocation";
 import { DeliveryTimePicker } from "@/components/product/DeliveryTimePicker";
 import { OrderNoteInput } from "@/components/product/OrderNoteInput";
+import { ProductOptionSelect } from "@/components/product/ProductOptionSelect";
 import { ProductDetailInfo } from "@/components/product/ProductDetailInfo";
 import { QuantityStepper } from "@/components/product/QuantityStepper";
 import { WeightSelector } from "@/components/product/WeightSelector";
@@ -58,12 +59,20 @@ export function ProductPurchaseForm({
   const variationAttributes = getVariationAttributes(product.attributes);
   const visibleAttributes = getVisibleVariationAttributes(product.attributes);
   const weightOptions = getWeightOptions(product);
+  const colorOptions = product.colorOptions;
+  const flavorOptions = product.flavorOptions;
   const showCakeMessage = productSupportsCakeMessage(product);
   const [selectedAttributes, setSelectedAttributes] = useState(() =>
     getInitialAttributeSelections(visibleAttributes),
   );
   const [cakeMessage, setCakeMessage] = useState("");
   const [orderNote, setOrderNote] = useState("");
+  const [selectedColor, setSelectedColor] = useState(
+    () => product.colorOptions[0] ?? "",
+  );
+  const [selectedFlavor, setSelectedFlavor] = useState(
+    () => product.flavorOptions[0] ?? "",
+  );
   const [pincode, setPincode] = useState("");
   const [pincodeValidated, setPincodeValidated] = useState(false);
   const [deliveryZone, setDeliveryZone] = useState("");
@@ -146,6 +155,8 @@ export function ProductPurchaseForm({
         ),
         cakeMessage: showCakeMessage ? cakeMessage : "",
         orderNote,
+        color: colorOptions.length > 0 ? selectedColor : undefined,
+        flavor: flavorOptions.length > 0 ? selectedFlavor : undefined,
         deliveryPincode: pincode,
         deliveryDate,
         deliverySlot,
@@ -205,6 +216,22 @@ export function ProductPurchaseForm({
             onChange={updateWeightSelection}
           />
         ) : null}
+
+        <ProductOptionSelect
+          id="product-color"
+          label="Color"
+          options={colorOptions}
+          value={selectedColor}
+          onChange={setSelectedColor}
+        />
+
+        <ProductOptionSelect
+          id="product-flavor"
+          label="Flavor"
+          options={flavorOptions}
+          value={selectedFlavor}
+          onChange={setSelectedFlavor}
+        />
 
         <ProductDetailInfo
           product={product}

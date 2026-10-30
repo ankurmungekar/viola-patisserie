@@ -54,6 +54,18 @@ interface StoreProductVariation {
   is_in_stock?: boolean;
 }
 
+interface StoreViolaCommerceProductExtensions {
+  allergens?: string;
+  consumption?: string;
+  storage_info?: string;
+  color_options?: string[];
+  flavor_options?: string[];
+}
+
+interface StoreProductExtensions {
+  viola_commerce?: StoreViolaCommerceProductExtensions;
+}
+
 export interface StoreProduct {
   id: number;
   name: string;
@@ -70,7 +82,53 @@ export interface StoreProduct {
   allergens?: string;
   consumption?: string;
   storage_info?: string;
+  color_options?: string[];
+  flavor_options?: string[];
+  extensions?: StoreProductExtensions;
   is_in_stock?: boolean;
+}
+
+function parseStoreOptionList(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const options: string[] = [];
+
+  for (const item of value) {
+    if (typeof item !== "string") {
+      continue;
+    }
+
+    const trimmed = item.trim();
+    if (trimmed) {
+      options.push(trimmed);
+    }
+  }
+
+  return options;
+}
+
+function readViolaProductFields(product: StoreProduct): {
+  allergens: string;
+  consumption: string;
+  storageInfo: string;
+  colorOptions: string[];
+  flavorOptions: string[];
+} {
+  const extension = product.extensions?.viola_commerce;
+
+  return {
+    allergens: (product.allergens ?? extension?.allergens ?? "").trim(),
+    consumption: (product.consumption ?? extension?.consumption ?? "").trim(),
+    storageInfo: (product.storage_info ?? extension?.storage_info ?? "").trim(),
+    colorOptions: parseStoreOptionList(
+      product.color_options ?? extension?.color_options,
+    ),
+    flavorOptions: parseStoreOptionList(
+      product.flavor_options ?? extension?.flavor_options,
+    ),
+  };
 }
 
 function parsePrice(prices?: StoreProductPrices | null): number {
@@ -184,8 +242,9 @@ function mapProductDetail(
       ? Math.min(...variationPrices)
       : parsePrice(product.prices);
   const shortDescription =
-    product.short_description?.trim() ||
-    stripHtml(product.description);
+    stripHtml(product.short_description ?? "") ||
+    stripHtml(product.description ?? "");
+  const violaFields = readViolaProductFields(product);
 
   return {
     id: product.id,
@@ -193,9 +252,11 @@ function mapProductDetail(
     slug: product.slug,
     description: stripHtml(product.description),
     shortDescription,
-    allergens: product.allergens?.trim() ?? "",
-    consumption: product.consumption?.trim() ?? "",
-    storageInfo: product.storage_info?.trim() ?? "",
+    allergens: violaFields.allergens,
+    consumption: violaFields.consumption,
+    storageInfo: violaFields.storageInfo,
+    colorOptions: violaFields.colorOptions,
+    flavorOptions: violaFields.flavorOptions,
     price,
     priceHtml: price > 0 ? formatPrice(price) : "",
     image: images[0],

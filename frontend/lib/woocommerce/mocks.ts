@@ -15,6 +15,8 @@ const classicTruffleDetail: ProductDetail = {
   consumption:
     "Refrigerate upon arrival. Leave at room temperature for 45 mins before consumption.",
   storageInfo: "5 days refrigerated",
+  colorOptions: [],
+  flavorOptions: [],
   price: 895,
   priceHtml: "₹ 895",
   image: {

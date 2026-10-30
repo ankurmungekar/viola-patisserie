@@ -13,6 +13,8 @@ export interface AddToCartPayload {
   variation?: { attribute: string; value: string }[];
   cakeMessage?: string;
   orderNote?: string;
+  color?: string;
+  flavor?: string;
   deliveryPincode?: string;
   deliveryDate?: string;
   deliverySlot?: string;

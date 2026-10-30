@@ -43,6 +43,8 @@ export interface ProductDetail extends Product {
   allergens: string;
   consumption: string;
   storageInfo: string;
+  colorOptions: string[];
+  flavorOptions: string[];
   images: ProductImage[];
   categories: ProductCategoryRef[];
   primaryCategory: ProductCategoryRef;

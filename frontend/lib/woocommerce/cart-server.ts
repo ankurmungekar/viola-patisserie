@@ -21,6 +21,8 @@ interface StoreCartItemExtensions {
   viola_commerce?: {
     cake_message?: string;
     order_note?: string;
+    color?: string;
+    flavor?: string;
     delivery_pincode?: string;
     delivery_date?: string;
     delivery_slot?: string;
@@ -105,6 +107,8 @@ function mapExtensions(
   return {
     cakeMessage: viola?.cake_message ?? "",
     orderNote: viola?.order_note ?? "",
+    color: viola?.color ?? "",
+    flavor: viola?.flavor ?? "",
     deliveryPincode: viola?.delivery_pincode ?? "",
     deliveryDate: viola?.delivery_date ?? "",
     deliverySlot: viola?.delivery_slot ?? "",
@@ -276,6 +280,8 @@ export async function addItemToCart(
     variation?: { attribute: string; value: string }[];
     cakeMessage?: string;
     orderNote?: string;
+    color?: string;
+    flavor?: string;
     deliveryPincode?: string;
     deliveryDate?: string;
     deliverySlot?: string;
@@ -299,6 +305,14 @@ export async function addItemToCart(
 
   if (payload.orderNote) {
     violaExtensions.order_note = payload.orderNote;
+  }
+
+  if (payload.color) {
+    violaExtensions.color = payload.color;
+  }
+
+  if (payload.flavor) {
+    violaExtensions.flavor = payload.flavor;
   }
 
   if (payload.deliveryPincode) {

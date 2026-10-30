@@ -52,6 +52,18 @@ function viola_commerce_register_cart_extension(): void
                         'context' => ['view', 'edit'],
                         'readonly' => true,
                     ],
+                    'color' => [
+                        'description' => 'Selected product color.',
+                        'type' => 'string',
+                        'context' => ['view', 'edit'],
+                        'readonly' => true,
+                    ],
+                    'flavor' => [
+                        'description' => 'Selected product flavor.',
+                        'type' => 'string',
+                        'context' => ['view', 'edit'],
+                        'readonly' => true,
+                    ],
                 ];
             },
             'data_callback' => static function (array $cart_item): array {
@@ -62,10 +74,119 @@ function viola_commerce_register_cart_extension(): void
                     'delivery_slot' => (string) ($cart_item['viola_delivery_slot'] ?? ''),
                     'delivery_zone' => (string) ($cart_item['viola_delivery_zone'] ?? ''),
                     'order_note' => (string) ($cart_item['viola_order_note'] ?? ''),
+                    'color' => (string) ($cart_item['viola_color'] ?? ''),
+                    'flavor' => (string) ($cart_item['viola_flavor'] ?? ''),
                 ];
             },
         ]
     );
+}
+
+function viola_commerce_resolve_product_meta_id($product): int
+{
+    if (!is_object($product) || !method_exists($product, 'get_id')) {
+        return 0;
+    }
+
+    $product_id = (int) $product->get_id();
+
+    if (
+        method_exists($product, 'is_type')
+        && $product->is_type('variation')
+        && method_exists($product, 'get_parent_id')
+    ) {
+        $parent_id = (int) $product->get_parent_id();
+
+        if ($parent_id > 0) {
+            $product_id = $parent_id;
+        }
+    }
+
+    return $product_id;
+}
+
+function viola_commerce_get_product_detail_fields(int $product_id): array
+{
+    if ($product_id <= 0) {
+        return [
+            'allergens' => '',
+            'consumption' => '',
+            'storage_info' => '',
+            'color_options' => [],
+            'flavor_options' => [],
+        ];
+    }
+
+    return [
+        'allergens' => Viola_Commerce_Product_Meta::get_allergens($product_id),
+        'consumption' => Viola_Commerce_Product_Meta::get_consumption($product_id),
+        'storage_info' => Viola_Commerce_Product_Meta::get_storage_info($product_id),
+        'color_options' => Viola_Commerce_Product_Meta::get_color_options($product_id),
+        'flavor_options' => Viola_Commerce_Product_Meta::get_flavor_options($product_id),
+    ];
+}
+
+function viola_commerce_register_product_extension(): void
+{
+    if (!function_exists('woocommerce_store_api_register_endpoint_data')) {
+        return;
+    }
+
+    if (!class_exists(\Automattic\WooCommerce\StoreApi\Schemas\V1\ProductSchema::class)) {
+        return;
+    }
+
+    woocommerce_store_api_register_endpoint_data(
+        [
+            'endpoint' => \Automattic\WooCommerce\StoreApi\Schemas\V1\ProductSchema::IDENTIFIER,
+            'namespace' => 'viola_commerce',
+            'schema_callback' => static function (): array {
+                return [
+                    'allergens' => [
+                        'description' => 'Product allergens.',
+                        'type' => 'string',
+                        'context' => ['view', 'edit'],
+                        'readonly' => true,
+                    ],
+                    'consumption' => [
+                        'description' => 'Product consumption instructions.',
+                        'type' => 'string',
+                        'context' => ['view', 'edit'],
+                        'readonly' => true,
+                    ],
+                    'storage_info' => [
+                        'description' => 'Product storage information.',
+                        'type' => 'string',
+                        'context' => ['view', 'edit'],
+                        'readonly' => true,
+                    ],
+                    'color_options' => [
+                        'description' => 'Selectable color options.',
+                        'type' => 'array',
+                        'context' => ['view', 'edit'],
+                        'readonly' => true,
+                    ],
+                    'flavor_options' => [
+                        'description' => 'Selectable flavor options.',
+                        'type' => 'array',
+                        'context' => ['view', 'edit'],
+                        'readonly' => true,
+                    ],
+                ];
+            },
+            'data_callback' => static function ($product): array {
+                $product_id = viola_commerce_resolve_product_meta_id($product);
+
+                return viola_commerce_get_product_detail_fields($product_id);
+            },
+        ]
+    );
+}
+
+function viola_commerce_register_store_api_extensions(): void
+{
+    viola_commerce_register_cart_extension();
+    viola_commerce_register_product_extension();
 }
 
 function viola_commerce_store_api_add_to_cart_data(array $add_to_cart_data, $request): array
@@ -110,6 +231,14 @@ function viola_commerce_store_api_add_to_cart_data(array $add_to_cart_data, $req
 
     if (!empty($viola_extensions['order_note'])) {
         $add_to_cart_data['cart_item_data']['viola_order_note'] = sanitize_textarea_field((string) $viola_extensions['order_note']);
+    }
+
+    if (!empty($viola_extensions['color'])) {
+        $add_to_cart_data['cart_item_data']['viola_color'] = sanitize_text_field((string) $viola_extensions['color']);
+    }
+
+    if (!empty($viola_extensions['flavor'])) {
+        $add_to_cart_data['cart_item_data']['viola_flavor'] = sanitize_text_field((string) $viola_extensions['flavor']);
     }
 
     return $add_to_cart_data;
@@ -189,26 +318,28 @@ function viola_commerce_store_api_product_response(array $response, $product): a
         return $response;
     }
 
-    $product_id = (int) $product->get_id();
+    $fields = viola_commerce_get_product_detail_fields(
+        viola_commerce_resolve_product_meta_id($product),
+    );
 
-    if (method_exists($product, 'is_type') && $product->is_type('variation') && method_exists($product, 'get_parent_id')) {
-        $product_id = (int) $product->get_parent_id();
+    if ($fields['allergens'] !== '') {
+        $response['allergens'] = $fields['allergens'];
     }
 
-    $allergens = Viola_Commerce_Product_Meta::get_allergens($product_id);
-    $consumption = Viola_Commerce_Product_Meta::get_consumption($product_id);
-    $storage_info = Viola_Commerce_Product_Meta::get_storage_info($product_id);
-
-    if ($allergens !== '') {
-        $response['allergens'] = $allergens;
+    if ($fields['consumption'] !== '') {
+        $response['consumption'] = $fields['consumption'];
     }
 
-    if ($consumption !== '') {
-        $response['consumption'] = $consumption;
+    if ($fields['storage_info'] !== '') {
+        $response['storage_info'] = $fields['storage_info'];
     }
 
-    if ($storage_info !== '') {
-        $response['storage_info'] = $storage_info;
+    if (count($fields['color_options']) > 0) {
+        $response['color_options'] = $fields['color_options'];
+    }
+
+    if (count($fields['flavor_options']) > 0) {
+        $response['flavor_options'] = $fields['flavor_options'];
     }
 
     $gallery_images = viola_commerce_get_product_gallery_images($product);
@@ -225,6 +356,8 @@ function viola_commerce_persist_order_line_item_meta($item, string $cart_item_ke
     $meta_map = [
         'viola_cake_message' => 'Cake Message',
         'viola_order_note' => 'Order Note',
+        'viola_color' => 'Color',
+        'viola_flavor' => 'Flavor',
         'viola_delivery_pincode' => 'Delivery Pincode',
         'viola_delivery_date' => 'Delivery Date',
         'viola_delivery_slot' => 'Delivery Slot',
@@ -280,9 +413,9 @@ function viola_commerce_copy_delivery_meta_to_order($order, $data): void
 function viola_commerce_register_cart_hooks(): void
 {
     if (did_action('woocommerce_blocks_loaded')) {
-        viola_commerce_register_cart_extension();
+        viola_commerce_register_store_api_extensions();
     } else {
-        add_action('woocommerce_blocks_loaded', 'viola_commerce_register_cart_extension');
+        add_action('woocommerce_blocks_loaded', 'viola_commerce_register_store_api_extensions');
     }
 
     add_filter('woocommerce_store_api_add_to_cart_data', 'viola_commerce_store_api_add_to_cart_data', 10, 2);
