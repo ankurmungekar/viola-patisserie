@@ -1,5 +1,6 @@
 export interface CartItemExtensions {
   cakeMessage: string;
+  orderNote: string;
   deliveryPincode: string;
   deliveryDate: string;
   deliverySlot: string;

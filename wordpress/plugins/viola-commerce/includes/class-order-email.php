@@ -108,18 +108,23 @@ class Viola_Commerce_Order_Email
             }
 
             $cake_message = trim((string) $item->get_meta('Cake Message'));
+            $order_note = trim((string) $item->get_meta('Order Note'));
             $message_line = $cake_message !== ''
                 ? '<br><span style="font-size:13px;color:#7a6880;">Message: “' . esc_html($cake_message) . '”</span>'
+                : '';
+            $note_line = $order_note !== ''
+                ? '<br><span style="font-size:13px;color:#7a6880;">Note: “' . esc_html($order_note) . '”</span>'
                 : '';
 
             $rows .= sprintf(
                 '<tr>
-                    <td style="padding:12px 0;border-bottom:1px solid #f0e4dd;font-size:14px;line-height:1.5;color:#240630;">%s <span style="color:#7a6880;">× %d</span>%s</td>
+                    <td style="padding:12px 0;border-bottom:1px solid #f0e4dd;font-size:14px;line-height:1.5;color:#240630;">%s <span style="color:#7a6880;">× %d</span>%s%s</td>
                     <td style="padding:12px 0;border-bottom:1px solid #f0e4dd;font-size:14px;color:#240630;text-align:right;white-space:nowrap;vertical-align:top;">%s</td>
                 </tr>',
                 esc_html($item->get_name()),
                 (int) $item->get_quantity(),
                 $message_line,
+                $note_line,
                 wp_kses_post($order->get_formatted_line_subtotal($item))
             );
         }

@@ -40,7 +40,9 @@ export interface Product {
 
 export interface ProductDetail extends Product {
   shortDescription: string;
-  storageInstructions: string;
+  allergens: string;
+  consumption: string;
+  storageInfo: string;
   images: ProductImage[];
   categories: ProductCategoryRef[];
   primaryCategory: ProductCategoryRef;

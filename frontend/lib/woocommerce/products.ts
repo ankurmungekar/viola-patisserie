@@ -1,6 +1,5 @@
 import { DEFAULT_PRODUCT_IMAGE } from "@/lib/config/products";
 import { signatureCategorySlugs } from "@/lib/config/site";
-import { DEFAULT_STORAGE_INSTRUCTIONS } from "@/lib/config/product-defaults";
 import { buildProductPermalink } from "@/lib/woocommerce/permalink";
 import { safeStoreFetch, storeFetch } from "@/lib/woocommerce/client";
 import {
@@ -68,7 +67,9 @@ export interface StoreProduct {
   categories?: StoreProductCategory[];
   attributes?: StoreProductAttribute[];
   variations?: StoreProductVariation[];
-  storage_instructions?: string;
+  allergens?: string;
+  consumption?: string;
+  storage_info?: string;
   is_in_stock?: boolean;
 }
 
@@ -192,8 +193,9 @@ function mapProductDetail(
     slug: product.slug,
     description: stripHtml(product.description),
     shortDescription,
-    storageInstructions:
-      product.storage_instructions?.trim() || DEFAULT_STORAGE_INSTRUCTIONS,
+    allergens: product.allergens?.trim() ?? "",
+    consumption: product.consumption?.trim() ?? "",
+    storageInfo: product.storage_info?.trim() ?? "",
     price,
     priceHtml: price > 0 ? formatPrice(price) : "",
     image: images[0],

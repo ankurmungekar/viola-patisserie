@@ -46,6 +46,12 @@ function viola_commerce_register_cart_extension(): void
                         'context' => ['view', 'edit'],
                         'readonly' => true,
                     ],
+                    'order_note' => [
+                        'description' => 'Customer note for the order line item.',
+                        'type' => 'string',
+                        'context' => ['view', 'edit'],
+                        'readonly' => true,
+                    ],
                 ];
             },
             'data_callback' => static function (array $cart_item): array {
@@ -55,6 +61,7 @@ function viola_commerce_register_cart_extension(): void
                     'delivery_date' => (string) ($cart_item['viola_delivery_date'] ?? ''),
                     'delivery_slot' => (string) ($cart_item['viola_delivery_slot'] ?? ''),
                     'delivery_zone' => (string) ($cart_item['viola_delivery_zone'] ?? ''),
+                    'order_note' => (string) ($cart_item['viola_order_note'] ?? ''),
                 ];
             },
         ]
@@ -99,6 +106,10 @@ function viola_commerce_store_api_add_to_cart_data(array $add_to_cart_data, $req
 
     if (!empty($viola_extensions['delivery_zone'])) {
         $add_to_cart_data['cart_item_data']['viola_delivery_zone'] = sanitize_text_field((string) $viola_extensions['delivery_zone']);
+    }
+
+    if (!empty($viola_extensions['order_note'])) {
+        $add_to_cart_data['cart_item_data']['viola_order_note'] = sanitize_textarea_field((string) $viola_extensions['order_note']);
     }
 
     return $add_to_cart_data;
@@ -174,10 +185,30 @@ function viola_commerce_get_product_gallery_images($product): array
 
 function viola_commerce_store_api_product_response(array $response, $product): array
 {
-    $storage = get_post_meta($product->get_id(), '_storage_instructions', true);
+    if (!is_object($product) || !method_exists($product, 'get_id')) {
+        return $response;
+    }
 
-    if (is_string($storage) && $storage !== '') {
-        $response['storage_instructions'] = $storage;
+    $product_id = (int) $product->get_id();
+
+    if (method_exists($product, 'is_type') && $product->is_type('variation') && method_exists($product, 'get_parent_id')) {
+        $product_id = (int) $product->get_parent_id();
+    }
+
+    $allergens = Viola_Commerce_Product_Meta::get_allergens($product_id);
+    $consumption = Viola_Commerce_Product_Meta::get_consumption($product_id);
+    $storage_info = Viola_Commerce_Product_Meta::get_storage_info($product_id);
+
+    if ($allergens !== '') {
+        $response['allergens'] = $allergens;
+    }
+
+    if ($consumption !== '') {
+        $response['consumption'] = $consumption;
+    }
+
+    if ($storage_info !== '') {
+        $response['storage_info'] = $storage_info;
     }
 
     $gallery_images = viola_commerce_get_product_gallery_images($product);
@@ -193,6 +224,7 @@ function viola_commerce_persist_order_line_item_meta($item, string $cart_item_ke
 {
     $meta_map = [
         'viola_cake_message' => 'Cake Message',
+        'viola_order_note' => 'Order Note',
         'viola_delivery_pincode' => 'Delivery Pincode',
         'viola_delivery_date' => 'Delivery Date',
         'viola_delivery_slot' => 'Delivery Slot',

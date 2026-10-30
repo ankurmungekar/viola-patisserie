@@ -4,9 +4,11 @@ import { useMemo, useState } from "react";
 import { CakeMessageInput } from "@/components/product/CakeMessageInput";
 import { DeliveryLocation } from "@/components/product/DeliveryLocation";
 import { DeliveryTimePicker } from "@/components/product/DeliveryTimePicker";
+import { OrderNoteInput } from "@/components/product/OrderNoteInput";
+import { ProductDetailInfo } from "@/components/product/ProductDetailInfo";
 import { QuantityStepper } from "@/components/product/QuantityStepper";
-import { StorageInstructions } from "@/components/product/StorageInstructions";
 import { WeightSelector } from "@/components/product/WeightSelector";
+import { cakeMessageCategorySlugs } from "@/lib/config/product-defaults";
 import { addToCart } from "@/lib/woocommerce/cart";
 import {
   buildCartVariationPayload,
@@ -41,6 +43,14 @@ function getWeightOptions(product: ProductDetail): string[] {
   return [];
 }
 
+function productSupportsCakeMessage(product: ProductDetail): boolean {
+  return product.categories.some((category) =>
+    cakeMessageCategorySlugs.includes(
+      category.slug as (typeof cakeMessageCategorySlugs)[number],
+    ),
+  );
+}
+
 export function ProductPurchaseForm({
   product,
   className = "",
@@ -48,10 +58,12 @@ export function ProductPurchaseForm({
   const variationAttributes = getVariationAttributes(product.attributes);
   const visibleAttributes = getVisibleVariationAttributes(product.attributes);
   const weightOptions = getWeightOptions(product);
+  const showCakeMessage = productSupportsCakeMessage(product);
   const [selectedAttributes, setSelectedAttributes] = useState(() =>
     getInitialAttributeSelections(visibleAttributes),
   );
   const [cakeMessage, setCakeMessage] = useState("");
+  const [orderNote, setOrderNote] = useState("");
   const [pincode, setPincode] = useState("");
   const [pincodeValidated, setPincodeValidated] = useState(false);
   const [deliveryZone, setDeliveryZone] = useState("");
@@ -132,7 +144,8 @@ export function ProductPurchaseForm({
           variationAttributes,
           cartSelections,
         ),
-        cakeMessage,
+        cakeMessage: showCakeMessage ? cakeMessage : "",
+        orderNote,
         deliveryPincode: pincode,
         deliveryDate,
         deliverySlot,
@@ -178,6 +191,12 @@ export function ProductPurchaseForm({
         </p>
       ) : null}
 
+      <ProductDetailInfo
+        product={product}
+        fields={["allergens"]}
+        className="mt-8"
+      />
+
       <div className="mt-8 space-y-6">
         {weightOptions.length > 0 ? (
           <WeightSelector
@@ -187,7 +206,14 @@ export function ProductPurchaseForm({
           />
         ) : null}
 
-        <CakeMessageInput value={cakeMessage} onChange={setCakeMessage} />
+        <ProductDetailInfo
+          product={product}
+          fields={["consumption", "storageInfo"]}
+        />
+
+        {showCakeMessage ? (
+          <CakeMessageInput value={cakeMessage} onChange={setCakeMessage} />
+        ) : null}
 
         <DeliveryLocation
           pincode={pincode}
@@ -238,7 +264,7 @@ export function ProductPurchaseForm({
           </p>
         ) : null}
 
-        <StorageInstructions instructions={product.storageInstructions} />
+        <OrderNoteInput value={orderNote} onChange={setOrderNote} />
       </div>
     </div>
   );

@@ -20,6 +20,7 @@ interface StoreCartImage {
 interface StoreCartItemExtensions {
   viola_commerce?: {
     cake_message?: string;
+    order_note?: string;
     delivery_pincode?: string;
     delivery_date?: string;
     delivery_slot?: string;
@@ -103,6 +104,7 @@ function mapExtensions(
 
   return {
     cakeMessage: viola?.cake_message ?? "",
+    orderNote: viola?.order_note ?? "",
     deliveryPincode: viola?.delivery_pincode ?? "",
     deliveryDate: viola?.delivery_date ?? "",
     deliverySlot: viola?.delivery_slot ?? "",
@@ -273,6 +275,7 @@ export async function addItemToCart(
     quantity: number;
     variation?: { attribute: string; value: string }[];
     cakeMessage?: string;
+    orderNote?: string;
     deliveryPincode?: string;
     deliveryDate?: string;
     deliverySlot?: string;
@@ -288,20 +291,35 @@ export async function addItemToCart(
     body.variation = payload.variation;
   }
 
-  if (
-    payload.cakeMessage ||
-    payload.deliveryPincode ||
-    payload.deliveryDate ||
-    payload.deliverySlot
-  ) {
+  const violaExtensions: Record<string, string> = {};
+
+  if (payload.cakeMessage) {
+    violaExtensions.cake_message = payload.cakeMessage;
+  }
+
+  if (payload.orderNote) {
+    violaExtensions.order_note = payload.orderNote;
+  }
+
+  if (payload.deliveryPincode) {
+    violaExtensions.delivery_pincode = payload.deliveryPincode;
+  }
+
+  if (payload.deliveryDate) {
+    violaExtensions.delivery_date = payload.deliveryDate;
+  }
+
+  if (payload.deliverySlot) {
+    violaExtensions.delivery_slot = payload.deliverySlot;
+  }
+
+  if (payload.deliveryZone) {
+    violaExtensions.delivery_zone = payload.deliveryZone;
+  }
+
+  if (Object.keys(violaExtensions).length > 0) {
     body.extensions = {
-      viola_commerce: {
-        cake_message: payload.cakeMessage ?? "",
-        delivery_pincode: payload.deliveryPincode ?? "",
-        delivery_date: payload.deliveryDate ?? "",
-        delivery_slot: payload.deliverySlot ?? "",
-        delivery_zone: payload.deliveryZone ?? "",
-      },
+      viola_commerce: violaExtensions,
     };
   }
 

@@ -3,8 +3,6 @@ import { DEFAULT_PRODUCT_IMAGE } from "@/lib/config/products";
 import type { Category } from "@/types/category";
 import type { Product, ProductDetail } from "@/types/product";
 
-import { DEFAULT_STORAGE_INSTRUCTIONS } from "@/lib/config/product-defaults";
-
 const classicTruffleDetail: ProductDetail = {
   id: 102,
   name: "Classic chocolate truffle cake",
@@ -13,7 +11,10 @@ const classicTruffleDetail: ProductDetail = {
     "A timeless indulgence crafted with layers of moist chocolate sponge, silky dark chocolate ganache, and finished with a smooth truffle glaze. Rich, decadent, and perfect for every celebration.",
   shortDescription:
     "A timeless indulgence crafted with layers of moist chocolate sponge, silky dark chocolate ganache, and finished with a smooth truffle glaze. Rich, decadent, and perfect for every celebration.",
-  storageInstructions: DEFAULT_STORAGE_INSTRUCTIONS,
+  allergens: "Nuts, Dairy, Gluten",
+  consumption:
+    "Refrigerate upon arrival. Leave at room temperature for 45 mins before consumption.",
+  storageInfo: "5 days refrigerated",
   price: 895,
   priceHtml: "₹ 895",
   image: {

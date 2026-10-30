@@ -12,6 +12,7 @@ interface AddItemBody {
   quantity: number;
   variation?: { attribute: string; value: string }[];
   cakeMessage?: string;
+  orderNote?: string;
   deliveryPincode?: string;
   deliveryDate?: string;
   deliverySlot?: string;

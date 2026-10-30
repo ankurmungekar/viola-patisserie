@@ -30,6 +30,7 @@ require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-custom-cakes-settings.p
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/delivery-defaults.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-delivery-rest-api.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-delivery-settings.php';
+require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-product-meta.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/cart-extensions.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-cart-rest-api.php';
 require_once VIOLA_COMMERCE_PLUGIN_DIR . 'includes/class-razorpay-gateway.php';
@@ -91,6 +92,9 @@ function viola_commerce_init(): void
 
         $delivery_settings = new Viola_Commerce_Delivery_Settings();
         $delivery_settings->register();
+
+        $product_meta = new Viola_Commerce_Product_Meta();
+        $product_meta->register();
     }
 }
 
