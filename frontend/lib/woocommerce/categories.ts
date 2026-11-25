@@ -22,8 +22,8 @@ interface StoreCategory {
 
 function mapCategory(category: StoreCategory): Category {
   const imageSrc = normalizeWordPressImageUrl(
-    category.image?.thumbnail ??
-      category.image?.src ??
+    category.image?.src ??
+      category.image?.thumbnail ??
       DEFAULT_CATEGORY_IMAGE,
   );
 
